@@ -291,8 +291,8 @@
   <data name="EnterAnItemName" xml:space="preserve">
     <value>Insira o nome do item</value>
   </data>
-  <data name="RenameDialog.PrimaryButtonText" xml:space="preserve">
-    <value>Defina um nome</value>
+  <data name="CreateNewItemTitle" xml:space="preserve">
+    <value>Criar novo {0}</value>
   </data>
   <data name="LightTheme" xml:space="preserve">
     <value>Claro</value>
@@ -3943,5 +3943,11 @@
   </data>
   <data name="Toolbars" xml:space="preserve">
     <value>Barras de ferramentas</value>
+  </data>
+  <data name="UserID" xml:space="preserve">
+    <value>ID do usuário</value>
+  </data>
+  <data name="BulkRename" xml:space="preserve">
+    <value>Renomear em massa</value>
   </data>
 </root>

@@ -291,8 +291,8 @@
   <data name="EnterAnItemName" xml:space="preserve">
     <value>输入项目名称</value>
   </data>
-  <data name="RenameDialog.PrimaryButtonText" xml:space="preserve">
-    <value>命名</value>
+  <data name="CreateNewItemTitle" xml:space="preserve">
+    <value>Create new {0}</value>
   </data>
   <data name="LightTheme" xml:space="preserve">
     <value>浅色</value>
@@ -3943,5 +3943,11 @@
   </data>
   <data name="Toolbars" xml:space="preserve">
     <value>工具栏</value>
+  </data>
+  <data name="UserID" xml:space="preserve">
+    <value>用户 ID</value>
+  </data>
+  <data name="BulkRename" xml:space="preserve">
+    <value>批量重命名</value>
   </data>
 </root>
