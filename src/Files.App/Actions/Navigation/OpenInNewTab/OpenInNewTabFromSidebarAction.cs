@@ -6,7 +6,6 @@ namespace Files.App.Actions
 	internal sealed class OpenInNewTabFromSidebarAction : BaseOpenInNewTabAction
 	{
 		public override bool IsExecutable =>
-			UserSettingsService.GeneralSettingsService.ShowOpenInNewTab &&
 			SidebarContext.IsItemRightClicked &&
 			SidebarContext.RightClickedItem is not null &&
 			SidebarContext.RightClickedItem.MenuOptions.IsLocationItem;
@@ -22,7 +21,7 @@ namespace Files.App.Actions
 			if (await DriveHelpers.CheckEmptyDrive(SidebarContext.RightClickedItem!.Path))
 				return;
 
-			await NavigationHelpers.OpenPathInNewTab(SidebarContext.RightClickedItem!.Path ?? string.Empty, false);
+			await NavigationHelpers.OpenPathInNewTab(SidebarContext.RightClickedItem!.Path ?? string.Empty);
 		}
 
 		protected override void Context_PropertyChanged(object? sender, PropertyChangedEventArgs e)

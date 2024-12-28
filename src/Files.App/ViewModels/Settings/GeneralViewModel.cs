@@ -2,11 +2,7 @@
 // Licensed under the MIT License. See the LICENSE.
 
 using System.Collections.Specialized;
-using System.Globalization;
-using Vanara.PInvoke;
-using Windows.Globalization;
 using Windows.Storage;
-using Windows.Storage.Pickers;
 using Windows.System;
 using static Files.App.Helpers.MenuFlyoutHelper;
 using DispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue;
@@ -127,7 +123,7 @@ namespace Files.App.ViewModels.Settings
 			AppLifecycleHelper.SaveSessionTabs();
 
 			// Launches a new instance of Files
-			await Launcher.LaunchUriAsync(new Uri("files-uwp:"));
+			await Launcher.LaunchUriAsync(new Uri("files-dev:"));
 
 			// Closes the current instance
 			Process.GetCurrentProcess().Kill();
@@ -279,6 +275,20 @@ namespace Files.App.ViewModels.Settings
 			}
 		}
 
+		public bool ShowCreateAlternateDataStream
+		{
+			get => UserSettingsService.GeneralSettingsService.ShowCreateAlternateDataStream;
+			set
+			{
+				if (value != UserSettingsService.GeneralSettingsService.ShowCreateAlternateDataStream)
+				{
+					UserSettingsService.GeneralSettingsService.ShowCreateAlternateDataStream = value;
+
+					OnPropertyChanged();
+				}
+			}
+		}
+
 		public bool ShowCreateShortcut
 		{
 			get => UserSettingsService.GeneralSettingsService.ShowCreateShortcut;
@@ -301,6 +311,20 @@ namespace Files.App.ViewModels.Settings
 				if (value != UserSettingsService.GeneralSettingsService.AlwaysOpenDualPaneInNewTab)
 				{
 					UserSettingsService.GeneralSettingsService.AlwaysOpenDualPaneInNewTab = value;
+
+					OnPropertyChanged();
+				}
+			}
+		}
+
+		public bool AlwaysSwitchToNewlyOpenedTab
+		{
+			get => UserSettingsService.GeneralSettingsService.AlwaysSwitchToNewlyOpenedTab;
+			set
+			{
+				if (value != UserSettingsService.GeneralSettingsService.AlwaysSwitchToNewlyOpenedTab)
+				{
+					UserSettingsService.GeneralSettingsService.AlwaysSwitchToNewlyOpenedTab = value;
 
 					OnPropertyChanged();
 				}

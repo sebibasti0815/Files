@@ -3,7 +3,6 @@
 
 using Files.App.Helpers.ContextFlyouts;
 using Files.App.UserControls.Sidebar;
-using Files.App.ViewModels.Dialogs;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -12,13 +11,11 @@ using Microsoft.UI.Xaml.Media.Imaging;
 using System.Collections.Specialized;
 using System.IO;
 using System.Windows.Input;
-using Windows.ApplicationModel.DataTransfer.DragDrop;
 using Windows.ApplicationModel.DataTransfer;
+using Windows.ApplicationModel.DataTransfer.DragDrop;
 using Windows.Storage;
 using Windows.System;
 using Windows.UI.Core;
-using Files.Core.Storage;
-using Files.Core.Storage.Extensions;
 
 namespace Files.App.ViewModels.UserControls
 {
@@ -257,11 +254,7 @@ namespace Files.App.ViewModels.UserControls
 			HideSectionCommand = new RelayCommand(HideSection);
 			UnpinItemCommand = new RelayCommand(UnpinItem);
 			PinItemCommand = new RelayCommand(PinItem);
-			OpenInNewTabCommand = new AsyncRelayCommand(OpenInNewTabAsync);
-			OpenInNewWindowCommand = new AsyncRelayCommand(OpenInNewWindowAsync);
-			OpenInNewPaneCommand = new AsyncRelayCommand(OpenInNewPaneAsync);
 			EjectDeviceCommand = new RelayCommand(EjectDevice);
-			FormatDriveCommand = new RelayCommand(FormatDrive);
 			OpenPropertiesCommand = new RelayCommand<CommandBarFlyout>(OpenProperties);
 			ReorderItemsCommand = new AsyncRelayCommand(ReorderItemsAsync);
 		}
@@ -555,7 +548,7 @@ namespace Files.App.ViewModels.UserControls
 						{
 							break;
 						}
-						section = BuildSection("FileTags".GetLocalizedResource(), sectionType, new ContextMenuOptions { ShowHideSection = true }, false);
+						section = BuildSection("FileTags".GetLocalizedResource(), sectionType, new ContextMenuOptions { IsTagsHeader = true, ShowHideSection = true }, false);
 						icon = new BitmapImage(new Uri(Constants.FluentIconsPaths.FileTagsIcon));
 						section.IsHeader = true;
 						section.IsExpanded = UserSettingsService.GeneralSettingsService.IsFileTagsSectionExpanded;
@@ -768,7 +761,7 @@ namespace Files.App.ViewModels.UserControls
 				middleClickPressed) &&
 				navigationControlItem.Path is not null)
 			{
-				await NavigationHelpers.OpenPathInNewTab(navigationControlItem.Path, false);
+				await NavigationHelpers.OpenPathInNewTab(navigationControlItem.Path);
 				return;
 			}
 
@@ -834,42 +827,11 @@ namespace Files.App.ViewModels.UserControls
 
 		private ICommand UnpinItemCommand { get; }
 
-		private ICommand OpenInNewTabCommand { get; }
-
-		private ICommand OpenInNewWindowCommand { get; }
-
-		private ICommand OpenInNewPaneCommand { get; }
-
 		private ICommand EjectDeviceCommand { get; }
-
-		private ICommand FormatDriveCommand { get; }
 
 		private ICommand OpenPropertiesCommand { get; }
 
 		private ICommand ReorderItemsCommand { get; }
-
-		private async Task OpenInNewPaneAsync()
-		{
-			if (await DriveHelpers.CheckEmptyDrive(rightClickedItem.Path))
-				return;
-			PaneHolder.OpenSecondaryPane(rightClickedItem.Path);
-		}
-
-		private async Task OpenInNewTabAsync()
-		{
-			if (await DriveHelpers.CheckEmptyDrive(rightClickedItem.Path))
-				return;
-
-			await NavigationHelpers.OpenPathInNewTab(rightClickedItem.Path, false);
-		}
-
-		private async Task OpenInNewWindowAsync()
-		{
-			if (await DriveHelpers.CheckEmptyDrive(rightClickedItem.Path))
-				return;
-
-			await NavigationHelpers.OpenPathInNewWindowAsync(rightClickedItem.Path);
-		}
 
 		private void PinItem()
 		{
@@ -958,11 +920,6 @@ namespace Files.App.ViewModels.UserControls
 			DriveHelpers.EjectDeviceAsync(rightClickedItem.Path);
 		}
 
-		private void FormatDrive()
-		{
-			Win32Helper.OpenFormatDriveDialog(rightClickedItem.Path);
-		}
-
 		private List<ContextMenuFlyoutItemViewModel> GetLocationItemMenuItems(INavigationControlItem item, CommandBarFlyout menu)
 		{
 			var options = item.MenuOptions;
@@ -982,14 +939,14 @@ namespace Files.App.ViewModels.UserControls
 			{
 				new ContextMenuFlyoutItemViewModel()
 				{
-					Text = "SideBarCreateNewLibrary/Text".GetLocalizedResource(),
+					Text = Strings.SideBarCreateNewLibrary_Text.GetLocalizedResource(),
 					Glyph = "\uE710",
 					Command = CreateLibraryCommand,
 					ShowItem = options.IsLibrariesHeader
 				},
 				new ContextMenuFlyoutItemViewModel()
 				{
-					Text = "SideBarRestoreLibraries/Text".GetLocalizedResource(),
+					Text = Strings.SideBarRestoreLibraries_Text.GetLocalizedResource(),
 					Glyph = "\uE10E",
 					Command = RestoreLibrariesCommand,
 					ShowItem = options.IsLibrariesHeader
@@ -1002,9 +959,18 @@ namespace Files.App.ViewModels.UserControls
 				{
 					IsVisible = options.ShowEmptyRecycleBin,
 				}.Build(),
-				new ContextMenuFlyoutItemViewModelBuilder(Commands.OpenInNewTabFromSidebarAction).Build(),
-				new ContextMenuFlyoutItemViewModelBuilder(Commands.OpenInNewWindowFromSidebarAction).Build(),
-				new ContextMenuFlyoutItemViewModelBuilder(Commands.OpenInNewPaneFromSidebarAction).Build(),
+				new ContextMenuFlyoutItemViewModelBuilder(Commands.OpenInNewTabFromSidebarAction)
+				{
+					IsVisible = UserSettingsService.GeneralSettingsService.ShowOpenInNewTab && Commands.OpenInNewTabFromSidebarAction.IsExecutable
+				}.Build(),
+				new ContextMenuFlyoutItemViewModelBuilder(Commands.OpenInNewWindowFromSidebarAction)
+				{
+					IsVisible = UserSettingsService.GeneralSettingsService.ShowOpenInNewWindow && Commands.OpenInNewWindowFromSidebarAction.IsExecutable
+				}.Build(),
+				new ContextMenuFlyoutItemViewModelBuilder(Commands.OpenInNewPaneFromSidebarAction)
+				{
+					IsVisible = UserSettingsService.GeneralSettingsService.ShowOpenInNewPane && Commands.OpenInNewPaneFromSidebarAction.IsExecutable
+				}.Build(),
 				new ContextMenuFlyoutItemViewModel()
 				{
 					Text = "PinFolderToSidebar".GetLocalizedResource(),
@@ -1047,13 +1013,6 @@ namespace Files.App.ViewModels.UserControls
 				},
 				new ContextMenuFlyoutItemViewModel()
 				{
-					Text = "FormatDriveText".GetLocalizedResource(),
-					Command = FormatDriveCommand,
-					CommandParameter = item,
-					ShowItem = options.ShowFormatDrive
-				},
-				new ContextMenuFlyoutItemViewModel()
-				{
 					Text = "Properties".GetLocalizedResource(),
 					ThemedIconModel = new ThemedIconModel()
 					{
@@ -1066,9 +1025,13 @@ namespace Files.App.ViewModels.UserControls
 				new ContextMenuFlyoutItemViewModel()
 				{
 					ItemType = ContextMenuFlyoutItemType.Separator,
-					ShowItem = Commands.OpenTerminalFromSidebar.IsExecutable
+					ShowItem = Commands.OpenTerminalFromSidebar.IsExecutable ||
+						Commands.OpenStorageSenseFromSidebar.IsExecutable ||
+						Commands.FormatDriveFromSidebar.IsExecutable
 				},
 				new ContextMenuFlyoutItemViewModelBuilder(Commands.OpenTerminalFromSidebar).Build(),
+				new ContextMenuFlyoutItemViewModelBuilder(Commands.OpenStorageSenseFromSidebar).Build(),
+				new ContextMenuFlyoutItemViewModelBuilder(Commands.FormatDriveFromSidebar).Build(),
 				new ContextMenuFlyoutItemViewModel()
 				{
 					ItemType = ContextMenuFlyoutItemType.Separator,
@@ -1084,6 +1047,14 @@ namespace Files.App.ViewModels.UserControls
 					Tag = "ItemOverflow",
 					IsEnabled = false,
 					IsHidden = !options.ShowShellItems,
+				},
+				new ContextMenuFlyoutItemViewModel()
+				{
+					Text = "ManageTags".GetLocalizedResource(),
+					Glyph = "\uE8EC",
+					Command = Commands.OpenSettings,
+					CommandParameter = new SettingsNavigationParams() { PageKind = SettingsPageKind.TagsPage },
+					ShowItem = options.IsTagsHeader
 				}
 			}.Where(x => x.ShowItem).ToList();
 		}
@@ -1243,22 +1214,19 @@ namespace Files.App.ViewModels.UserControls
 
 			args.RawEvent.Handled = true;
 
-			// Comment out the code for dropping to Tags section as it is currently not supported.
+			var storageItems = await Utils.Storage.FilesystemHelpers.GetDraggedStorageItems(args.DroppedItem);
 
-			//var storageItems = await Utils.Storage.FilesystemHelpers.GetDraggedStorageItems(args.DroppedItem);
-
-			//if (!storageItems.Any())
-			//{
-			args.RawEvent.AcceptedOperation = DataPackageOperation.None;
-			//}
-			//else
-			//{
-			//	args.RawEvent.DragUIOverride.IsCaptionVisible = true;
-			//	args.RawEvent.DragUIOverride.Caption = string.Format("LinkToFolderCaptionText".GetLocalizedResource(), tagItem.Text);
-			//	args.RawEvent.AcceptedOperation = DataPackageOperation.Link;
-			//}
+			if (!storageItems.Any(x => !string.IsNullOrEmpty(x.Path)))
+			{
+				args.RawEvent.AcceptedOperation = DataPackageOperation.None;
+			}
+			else
+			{
+				args.RawEvent.DragUIOverride.IsCaptionVisible = true;
+				args.RawEvent.DragUIOverride.Caption = string.Format("LinkToFolderCaptionText".GetLocalizedResource(), tagItem.Text);
+				args.RawEvent.AcceptedOperation = DataPackageOperation.Link;
+			}
 		}
-
 
 		public async Task HandleItemDroppedAsync(ItemDroppedEventArgs args)
 		{
@@ -1266,11 +1234,8 @@ namespace Files.App.ViewModels.UserControls
 				await HandleLocationItemDroppedAsync(locationItem, args);
 			else if (args.DropTarget is DriveItem driveItem)
 				await HandleDriveItemDroppedAsync(driveItem, args);
-
-			// Comment out the code for dropping to Tags section as it is currently not supported.
-
-			//else if (args.DropTarget is FileTagItem fileTagItem)
-			//	await HandleTagItemDroppedAsync(fileTagItem, args);
+			else if (args.DropTarget is FileTagItem fileTagItem)
+				await HandleTagItemDroppedAsync(fileTagItem, args);
 		}
 
 		private async Task HandleLocationItemDroppedAsync(LocationItem locationItem, ItemDroppedEventArgs args)
@@ -1298,18 +1263,20 @@ namespace Files.App.ViewModels.UserControls
 			return FilesystemHelpers.PerformOperationTypeAsync(args.RawEvent.AcceptedOperation, args.RawEvent.DataView, driveItem.Path, false, true);
 		}
 
-		// TODO: This method effectively does nothing. We need to implement the functionality for dropping to Tags section.
 		private async Task HandleTagItemDroppedAsync(FileTagItem fileTagItem, ItemDroppedEventArgs args)
 		{
 			var storageItems = await Utils.Storage.FilesystemHelpers.GetDraggedStorageItems(args.DroppedItem);
+			var dbInstance = FileTagsHelper.GetDbInstance();
 			foreach (var item in storageItems.Where(x => !string.IsNullOrEmpty(x.Path)))
 			{
-				var listedItem = new ListedItem(null)
+				var filesTags = FileTagsHelper.ReadFileTag(item.Path);
+				if (!filesTags.Contains(fileTagItem.FileTag.Uid))
 				{
-					ItemPath = item.Path,
-					FileFRN = await FileTagsHelper.GetFileFRN(item.Item),
-					FileTags = [fileTagItem.FileTag.Uid]
-				};
+					filesTags = [.. filesTags, fileTagItem.FileTag.Uid];
+					var fileFRN = await FileTagsHelper.GetFileFRN(item.Item);
+					dbInstance.SetTags(item.Path, fileFRN, filesTags);
+					FileTagsHelper.WriteFileTag(item.Path, filesTags);
+				}
 			}
 		}
 

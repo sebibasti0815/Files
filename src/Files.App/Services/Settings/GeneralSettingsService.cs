@@ -77,6 +77,12 @@ namespace Files.App.Services.Settings
 			set => Set(value);
 		}
 
+		public bool AlwaysSwitchToNewlyOpenedTab
+		{
+			get => Get(false);
+			set => Set(value);
+		}
+
 		public bool ShowQuickAccessWidget
 		{
 			get => Get(true);
@@ -281,6 +287,12 @@ namespace Files.App.Services.Settings
 			set => Set(value);
 		}
 
+		public bool ShowCreateAlternateDataStream
+		{
+			get => Get(false);
+			set => Set(value);
+		}
+
 		public bool ShowCreateShortcut
 		{
 			get => Get(true);
@@ -289,7 +301,7 @@ namespace Files.App.Services.Settings
 
 		public bool LeaveAppRunning
 		{
-#if STORE || STABLE || PREVIEW
+#if RELEASE
 			get => Get(true);
 #else
 			get => Get(false);
@@ -306,6 +318,24 @@ namespace Files.App.Services.Settings
 		public FileNameConflictResolveOptionType ConflictsResolveOption
 		{
 			get => (FileNameConflictResolveOptionType)Get((long)FileNameConflictResolveOptionType.GenerateNewName);
+			set => Set((long)value);
+		}
+
+		public ArchiveFormats ArchiveFormatsOption
+		{
+			get => (ArchiveFormats)Get((long)ArchiveFormats.Zip);
+			set => Set((long)value);
+		}
+
+		public ArchiveCompressionLevels ArchiveCompressionLevelsOption
+		{
+			get => (ArchiveCompressionLevels)Get((long)ArchiveCompressionLevels.Normal);
+			set => Set((long)value);
+		}
+
+		public ArchiveSplittingSizes ArchiveSplittingSizesOption
+		{
+			get => (ArchiveSplittingSizes)Get((long)ArchiveSplittingSizes.None);
 			set => Set((long)value);
 		}
 

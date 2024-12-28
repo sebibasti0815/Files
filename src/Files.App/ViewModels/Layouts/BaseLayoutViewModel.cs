@@ -64,9 +64,9 @@ namespace Files.App.ViewModels.Layouts
 				_associatedInstance.SlimContentPage.IsMiddleClickToScrollEnabled = true;
 
 				if (Item.IsShortcut)
-					await NavigationHelpers.OpenPathInNewTab(((e.OriginalSource as FrameworkElement)?.DataContext as ShortcutItem)?.TargetPath ?? Item.ItemPath, false);
+					await NavigationHelpers.OpenPathInNewTab(((e.OriginalSource as FrameworkElement)?.DataContext as ShortcutItem)?.TargetPath ?? Item.ItemPath);
 				else
-					await NavigationHelpers.OpenPathInNewTab(Item.ItemPath, false);
+					await NavigationHelpers.OpenPathInNewTab(Item.ItemPath);
 			}
 		}
 
@@ -99,8 +99,6 @@ namespace Files.App.ViewModels.Layouts
 
 				return;
 			}
-
-			_itemManipulationModel.ClearSelection();
 
 			if (FilesystemHelpers.HasDraggedStorageItems(e.DataView))
 			{
@@ -166,6 +164,8 @@ namespace Files.App.ViewModels.Layouts
 							e.DragUIOverride.Caption = string.Format("CopyToFolderCaptionText".GetLocalizedResource(), folderName);
 							e.AcceptedOperation = DataPackageOperation.Copy;
 						}
+
+						_itemManipulationModel.ClearSelection();
 					}
 					catch (COMException ex) when (ex.Message.Contains("RPC server is unavailable"))
 					{
