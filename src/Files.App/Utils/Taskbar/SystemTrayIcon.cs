@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+﻿// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 using System.Drawing;
 using System.Runtime.InteropServices;
@@ -16,7 +16,7 @@ namespace Files.App.Utils.Taskbar
 	/// <summary>
 	/// Represents a tray icon of Notification Area so-called System Tray.
 	/// </summary>
-	public sealed class SystemTrayIcon : IDisposable
+	public sealed partial class SystemTrayIcon : IDisposable
 	{
 		// Constants
 

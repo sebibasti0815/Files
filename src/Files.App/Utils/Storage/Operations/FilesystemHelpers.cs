@@ -1,5 +1,5 @@
-// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 using Files.Core.Storage;
 using Files.Core.Storage.Extensions;
@@ -8,6 +8,7 @@ using Microsoft.Win32;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
+using Vanara.Extensions;
 using Vanara.PInvoke;
 using Vanara.Windows.Shell;
 using Windows.ApplicationModel.DataTransfer;
@@ -18,7 +19,7 @@ using FileAttributes = System.IO.FileAttributes;
 
 namespace Files.App.Utils.Storage
 {
-	public sealed class FilesystemHelpers : IFilesystemHelpers
+	public sealed partial class FilesystemHelpers : IFilesystemHelpers
 	{
 		private readonly IStorageTrashBinService StorageTrashBinService = Ioc.Default.GetRequiredService<IStorageTrashBinService>();
 		private readonly static StatusCenterViewModel _statusCenterViewModel = Ioc.Default.GetRequiredService<StatusCenterViewModel>();

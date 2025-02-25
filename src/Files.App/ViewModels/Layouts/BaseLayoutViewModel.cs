@@ -1,5 +1,5 @@
-// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
@@ -17,7 +17,7 @@ namespace Files.App.ViewModels.Layouts
 	/// <summary>
 	/// Represents ViewModel for <see cref="BaseLayoutPage"/>.
 	/// </summary>
-	public sealed class BaseLayoutViewModel : IDisposable
+	public sealed partial class BaseLayoutViewModel : IDisposable
 	{
 		protected ICommandManager Commands { get; } = Ioc.Default.GetRequiredService<ICommandManager>();
 		private ILogger? Logger { get; } = Ioc.Default.GetRequiredService<ILogger<App>>();

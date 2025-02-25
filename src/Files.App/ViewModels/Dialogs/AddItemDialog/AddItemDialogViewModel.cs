@@ -1,12 +1,12 @@
-﻿// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+﻿// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 using Files.Shared;
 using Files.Shared.Utils;
 
 namespace Files.App.ViewModels.Dialogs.AddItemDialog
 {
-	public sealed class AddItemDialogViewModel : ObservableObject
+	public sealed partial class AddItemDialogViewModel : ObservableObject
 	{
 		private readonly IImageService _imagingService;
 

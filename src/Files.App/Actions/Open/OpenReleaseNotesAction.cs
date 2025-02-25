@@ -1,11 +1,9 @@
-﻿// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
-
-using CommunityToolkit.WinUI.Helpers;
+﻿// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 namespace Files.App.Actions
 {
-	internal sealed class OpenReleaseNotesAction : ObservableObject, IAction
+	internal sealed partial class OpenReleaseNotesAction : ObservableObject, IAction
 	{
 		private readonly IDialogService DialogService = Ioc.Default.GetRequiredService<IDialogService>();
 		private readonly IUpdateService UpdateService = Ioc.Default.GetRequiredService<IUpdateService>();
@@ -14,6 +12,9 @@ namespace Files.App.Actions
 
 		public string Description
 			=> Strings.WhatsNewDescription.GetLocalizedResource();
+
+		public RichGlyph Glyph
+			=> new(themedIconStyle: "App.ThemedIcons.AppUpdatedBox");
 
 		public bool IsExecutable
 			=> UpdateService.AreReleaseNotesAvailable;

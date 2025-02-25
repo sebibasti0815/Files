@@ -1,4 +1,4 @@
-﻿<!--  Copyright (c) 2024 Files Community. Licensed under the MIT License. See the LICENSE.  -->
+﻿<!--  Copyright (c) Files Community. Licensed under the MIT License.  -->
 <UserControl
 	x:Class="Files.App.UserControls.InnerNavigationToolbar"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -10,7 +10,7 @@
 	xmlns:helpers="using:Files.App.Helpers"
 	xmlns:local="using:Files.App.UserControls"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	xmlns:wctconverters="using:CommunityToolkit.WinUI.UI.Converters"
+	xmlns:wctconverters="using:CommunityToolkit.WinUI.Converters"
 	DataContext="{x:Bind ViewModel, Mode=OneWay}"
 	mc:Ignorable="d">
 
@@ -28,7 +28,7 @@
 			<converters:GenericEnumConverter x:Key="GenericEnumConverter" />
 			<converters:EnumToHumanizedConverter x:Key="DetailsViewSizeKindEnumToHumanizedConverter" EnumTypeName="DetailsViewSizeKind" />
 			<converters:EnumToHumanizedConverter x:Key="ListViewSizeKindEnumToHumanizedConverter" EnumTypeName="ListViewSizeKind" />
-			<converters:EnumToHumanizedConverter x:Key="TilesViewSizeKindEnumToHumanizedConverter" EnumTypeName="TilesViewSizeKind" />
+			<converters:EnumToHumanizedConverter x:Key="CardsViewSizeKindEnumToHumanizedConverter" EnumTypeName="CardsViewSizeKind" />
 			<converters:EnumToHumanizedConverter x:Key="GridViewSizeKindEnumToHumanizedConverter" EnumTypeName="GridViewSizeKind" />
 			<converters:EnumToHumanizedConverter x:Key="ColumnsViewSizeKindEnumToHumanizedConverter" EnumTypeName="ColumnsViewSizeKind" />
 			<wctconverters:BoolNegationConverter x:Key="BoolNegationConverter" />
@@ -733,14 +733,14 @@
 									</StackPanel>
 								</RadioButton>
 
-								<!--  Tiles  -->
+								<!--  Cards  -->
 								<RadioButton
-									AutomationProperties.Name="{x:Bind Commands.LayoutTiles.AutomationName}"
-									Command="{x:Bind Commands.LayoutTiles}"
+									AutomationProperties.Name="{x:Bind Commands.LayoutCards.AutomationName}"
+									Command="{x:Bind Commands.LayoutCards}"
 									GroupName="LayoutRadio"
-									IsChecked="{x:Bind ViewModel.IsTilesLayout, Mode=OneWay}"
+									IsChecked="{x:Bind ViewModel.IsCardsLayout, Mode=OneWay}"
 									Style="{StaticResource Local.RadioToggleButtonStyle}"
-									ToolTipService.ToolTip="{x:Bind Commands.LayoutTiles.LabelWithHotKey, Mode=OneWay}">
+									ToolTipService.ToolTip="{x:Bind Commands.LayoutCards.LabelWithHotKey, Mode=OneWay}">
 
 									<StackPanel Spacing="4">
 										<controls:ThemedIcon
@@ -751,7 +751,7 @@
 										<TextBlock
 											HorizontalAlignment="Center"
 											FontSize="12"
-											Text="{x:Bind Commands.LayoutTiles.Label}"
+											Text="{x:Bind Commands.LayoutCards.Label}"
 											TextTrimming="CharacterEllipsis"
 											TextWrapping="NoWrap" />
 									</StackPanel>
@@ -950,21 +950,62 @@
 									</Grid>
 								</StackPanel>
 
-								<!--  Tiles  -->
-								<!--<Slider
-									x:Name="TilesViewSlider"
-									Padding="4,0,4,0"
-									Visibility="{x:Bind ViewModel.IsTilesLayout, Mode=OneWay}"
-									IsEnabled="False"
-									IsThumbToolTipEnabled="False" />-->
+								<!--  Cards  -->
 								<StackPanel
-									x:Name="TilesViewSizeInfo"
-									HorizontalAlignment="Left"
-									Orientation="Horizontal"
-									Spacing="8"
-									Visibility="{x:Bind ViewModel.IsTilesLayout, Mode=OneWay}">
-									<FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE946;" />
-									<TextBlock MaxWidth="360" Text="{helpers:ResourceString Name=TilesViewSizeInfo}" />
+									x:Name="CardsView"
+									Spacing="4"
+									Visibility="{x:Bind ViewModel.IsCardsLayout, Mode=OneWay}">
+									<Slider
+										x:Name="CardsViewSlider"
+										Padding="4,0,4,0"
+										Maximum="4"
+										Minimum="1"
+										SnapsTo="Ticks"
+										ThumbToolTipValueConverter="{StaticResource CardsViewSizeKindEnumToHumanizedConverter}"
+										TickFrequency="1"
+										TickPlacement="BottomRight"
+										Value="{x:Bind UserSettingsService.LayoutSettingsService.CardsViewSize, Mode=TwoWay, Converter={StaticResource GenericEnumConverter}, ConverterParameter='1-1,2-2,3-3,4-4'}" />
+
+									<!--  Cards  -->
+									<Grid HorizontalAlignment="Stretch">
+										<Grid.ColumnDefinitions>
+											<ColumnDefinition Width="Auto" />
+											<ColumnDefinition Width="*" />
+											<ColumnDefinition Width="Auto" />
+											<ColumnDefinition Width="*" />
+											<ColumnDefinition Width="Auto" />
+											<ColumnDefinition Width="*" />
+											<ColumnDefinition Width="Auto" />
+										</Grid.ColumnDefinitions>
+
+										<controls:ThemedIcon
+											Grid.Column="0"
+											Width="28"
+											Height="28"
+											IsFilled="{x:Bind ViewModel.IsLayoutSizeSmall, Mode=OneWay}"
+											Style="{StaticResource App.ThemedIcons.IconSize.Small.28}" />
+
+										<controls:ThemedIcon
+											Grid.Column="2"
+											Width="28"
+											Height="28"
+											IsFilled="{x:Bind ViewModel.IsLayoutSizeMedium, Mode=OneWay}"
+											Style="{StaticResource App.ThemedIcons.IconSize.Medium.28}" />
+
+										<controls:ThemedIcon
+											Grid.Column="4"
+											Width="28"
+											Height="28"
+											IsFilled="{x:Bind ViewModel.IsLayoutSizeLarge, Mode=OneWay}"
+											Style="{StaticResource App.ThemedIcons.IconSize.Large.28}" />
+
+										<controls:ThemedIcon
+											Grid.Column="6"
+											Width="28"
+											Height="28"
+											IsFilled="{x:Bind ViewModel.IsLayoutSizeExtraLarge, Mode=OneWay}"
+											Style="{StaticResource App.ThemedIcons.IconSize.ExtraLarge.28}" />
+									</Grid>
 								</StackPanel>
 
 								<!--  Grid  -->
@@ -1122,9 +1163,9 @@
 									<ColumnDefinition Width="Auto" />
 								</Grid.ColumnDefinitions>
 								<Grid.RowDefinitions>
-									<RowDefinition MinHeight="30" />
-									<RowDefinition MinHeight="30" />
-									<RowDefinition MinHeight="30" />
+									<RowDefinition Height="Auto" />
+									<RowDefinition Height="Auto" />
+									<RowDefinition Height="Auto" />
 								</Grid.RowDefinitions>
 
 								<!--  Show Hidden Files  -->
@@ -1164,22 +1205,25 @@
 
 								<!--  Adaptive Layout  -->
 								<TextBlock
+									x:Name="AdaptiveLayoutTextBlock"
 									Grid.Row="2"
 									Grid.Column="0"
 									VerticalAlignment="Center"
+									x:Load="{x:Bind Commands.LayoutAdaptive.IsExecutable, Mode=OneWay}"
 									Text="{x:Bind Commands.LayoutAdaptive.Label}" />
 
 								<ToggleSwitch
+									x:Name="AdaptiveLayoutToggleSwitch"
 									Grid.Row="2"
 									Grid.Column="1"
 									HorizontalAlignment="Right"
+									x:Load="{x:Bind Commands.LayoutAdaptive.IsExecutable, Mode=OneWay}"
 									AutomationProperties.Name="{x:Bind Commands.LayoutAdaptive.AutomationName}"
 									IsEnabled="{x:Bind Commands.LayoutAdaptive.IsExecutable, Mode=OneWay}"
 									IsOn="{x:Bind Commands.LayoutAdaptive.IsOn, Mode=TwoWay}"
 									Rotation="1"
 									Style="{StaticResource RightAlignedToggleSwitchStyle}"
 									ToolTipService.ToolTip="{x:Bind Commands.LayoutAdaptive.LabelWithHotKey, Mode=OneWay}" />
-
 							</Grid>
 
 						</StackPanel>

@@ -1,5 +1,5 @@
-// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 using Files.App.ViewModels.Properties;
 using SevenZip;
@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Files.App.ViewModels.Previews
 {
-	public sealed class ArchivePreviewViewModel : BasePreviewModel
+	public sealed partial class ArchivePreviewViewModel : BasePreviewModel
 	{
 		public ArchivePreviewViewModel(ListedItem item)
 			: base(item)

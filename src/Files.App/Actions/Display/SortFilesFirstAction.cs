@@ -1,9 +1,9 @@
-﻿// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+﻿// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 namespace Files.App.Actions
 {
-	internal sealed class SortFilesFirstAction : ObservableObject, IToggleAction
+	internal sealed partial class SortFilesFirstAction : ObservableObject, IToggleAction
 	{
 		private readonly IDisplayPageContext context;
 
@@ -27,6 +27,7 @@ namespace Files.App.Actions
 		{
 			context.SortFilesFirst = true;
 			context.SortDirectoriesAlongsideFiles = false;
+			LayoutHelpers.UpdateOpenTabsPreferences();
 
 			return Task.CompletedTask;
 		}

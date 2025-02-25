@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+﻿// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 using Files.Shared.Helpers;
 using System.IO;
@@ -7,7 +7,7 @@ using System.Windows.Input;
 
 namespace Files.App.ViewModels.Properties
 {
-	public sealed class HashesViewModel : ObservableObject, IDisposable
+	public sealed partial class HashesViewModel : ObservableObject, IDisposable
 	{
 		private IUserSettingsService UserSettingsService { get; } = Ioc.Default.GetService<IUserSettingsService>()!;
 
@@ -83,7 +83,7 @@ namespace Files.App.ViewModels.Properties
 				{
 					try
 					{
-						using (var stream = File.OpenRead(_item.ItemPath))
+						await using (var stream = File.OpenRead(_item.ItemPath))
 						{
 							hashInfoItem.HashValue = hashInfoItem.Algorithm switch
 							{

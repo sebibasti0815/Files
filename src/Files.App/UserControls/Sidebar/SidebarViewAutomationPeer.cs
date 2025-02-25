@@ -1,12 +1,12 @@
-﻿// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+﻿// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Automation.Provider;
 
 namespace Files.App.UserControls.Sidebar
 {
-	public sealed class SidebarViewAutomationPeer : FrameworkElementAutomationPeer, ISelectionProvider
+	public sealed partial class SidebarViewAutomationPeer : FrameworkElementAutomationPeer, ISelectionProvider
 	{
 		public bool CanSelectMultiple => false;
 		public bool IsSelectionRequired => true;

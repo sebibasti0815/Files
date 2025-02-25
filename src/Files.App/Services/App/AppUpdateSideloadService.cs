@@ -1,5 +1,5 @@
-// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 using CommunityToolkit.WinUI.Helpers;
 using Microsoft.Extensions.Logging;
@@ -12,7 +12,7 @@ using Windows.Storage;
 
 namespace Files.App.Services
 {
-	public sealed class SideloadUpdateService : ObservableObject, IUpdateService, IDisposable
+	public sealed partial class SideloadUpdateService : ObservableObject, IUpdateService, IDisposable
 	{
 		private const string SIDELOAD_STABLE = "https://cdn.files.community/files/stable/Files.Package.appinstaller";
 		private const string SIDELOAD_PREVIEW = "https://cdn.files.community/files/preview/Files.Package.appinstaller";
@@ -55,7 +55,7 @@ namespace Files.App.Services
 
 		public bool IsAppUpdated
 		{
-			get => SystemInformation.Instance.IsAppUpdated;
+			get => AppLifecycleHelper.IsAppUpdated;
 		}
 
 		private bool _areReleaseNotesAvailable = false;
@@ -134,8 +134,8 @@ namespace Files.App.Services
 
 				if (File.Exists(destHashFilePath))
 				{
-					using var srcStream = (await srcHashFile.OpenReadAsync()).AsStream();
-					using var destStream = File.OpenRead(destHashFilePath);
+					await using var srcStream = (await srcHashFile.OpenReadAsync()).AsStream();
+					await using var destStream = File.OpenRead(destHashFilePath);
 
 					hashEqual = HashEqual(srcStream, destStream);
 				}

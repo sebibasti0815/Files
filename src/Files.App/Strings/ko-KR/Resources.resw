@@ -1058,9 +1058,6 @@
   <data name="NavToolbarDetails.ToolTipService.ToolTip" xml:space="preserve">
     <value>자세히 (Ctrl+Shift+1)</value>
   </data>
-  <data name="NavToolbarTiles.ToolTipService.ToolTip" xml:space="preserve">
-    <value>타일 (Ctrl+Shift+2)</value>
-  </data>
   <data name="DateDeleted" xml:space="preserve">
     <value>삭제된 날짜</value>
   </data>
@@ -1658,15 +1655,6 @@
   <data name="Home" xml:space="preserve">
     <value>홈</value>
   </data>
-  <data name="BaseLayoutContextFlyoutDetails.KeyboardAcceleratorTextOverride" xml:space="preserve">
-    <value>Ctrl+Shift+1</value>
-  </data>
-  <data name="BaseLayoutContextFlyoutTiles.KeyboardAcceleratorTextOverride" xml:space="preserve">
-    <value>Ctrl+Shift+2</value>
-  </data>
-  <data name="BaseLayoutContextFlyoutColumn.KeyboardAcceleratorTextOverride" xml:space="preserve">
-    <value>Ctrl+Shift+6</value>
-  </data>
   <data name="ArchiveExtractionCompletedSuccessfullyText" xml:space="preserve">
     <value>압축 해제가 성공적으로 완료되었습니다.</value>
   </data>
@@ -1724,8 +1712,8 @@
   <data name="Columns" xml:space="preserve">
     <value>열</value>
   </data>
-  <data name="Tiles" xml:space="preserve">
-    <value>타일</value>
+  <data name="Cards" xml:space="preserve">
+    <value>Cards</value>
   </data>
   <data name="OpenFoldersInNewTab" xml:space="preserve">
     <value>새 탭에서 폴더 열기</value>
@@ -1838,6 +1826,18 @@
   <data name="CompatibilityRegisterThisProgramForRestart" xml:space="preserve">
     <value>다시 시작을 위해 이 프로그램을 등록</value>
   </data>
+  <data name="StartWindow" xml:space="preserve">
+    <value>Start window</value>
+  </data>
+  <data name="NormalWindow" xml:space="preserve">
+    <value>Normal window</value>
+  </data>
+  <data name="Minimized" xml:space="preserve">
+    <value>Minimized</value>
+  </data>
+  <data name="Maximized" xml:space="preserve">
+    <value>Maximized</value>
+  </data>
   <data name="RunAsAdministrator" xml:space="preserve">
     <value>관리자 권한으로 실행</value>
   </data>
@@ -1947,7 +1947,7 @@
     <value>다른 탭 닫기</value>
   </data>
   <data name="CloseAllTabs" xml:space="preserve">
-    <value>Close all tabs</value>
+    <value/>
   </data>
   <data name="Music" xml:space="preserve">
     <value>음악</value>
@@ -2194,6 +2194,9 @@
   </data>
   <data name="WhatsNew" xml:space="preserve">
     <value>새로운 기능</value>
+  </data>
+  <data name="WhatsNewDescription" xml:space="preserve">
+    <value>Open Release Notes</value>
   </data>
   <data name="CannotCreateShortcutDialogTitle" xml:space="preserve">
     <value>이 위치에 바로 가기를 만들려면 관리자 권한이 필요합니다</value>
@@ -2570,8 +2573,8 @@
   <data name="LayoutDetailsDescription" xml:space="preserve">
     <value>자세히 보기로 전환</value>
   </data>
-  <data name="LayoutTilesDescription" xml:space="preserve">
-    <value>타일 보기로 전환</value>
+  <data name="LayoutCardsDescription" xml:space="preserve">
+    <value>Switch to cards view</value>
   </data>
   <data name="LayoutListDescription" xml:space="preserve">
     <value>목록 보기로 전환</value>
@@ -3711,9 +3714,6 @@
   <data name="QuestionsAndDiscussions" xml:space="preserve">
     <value>질문과 토론</value>
   </data>
-  <data name="TilesViewSizeInfo" xml:space="preserve">
-    <value>타일 보기에서 크기 설정을 아직 지원하지 않습니다.</value>
-  </data>
   <data name="Compact" xml:space="preserve">
     <value>컴팩트</value>
     <comment>Used to describe layout sizes</comment>
@@ -3966,7 +3966,7 @@
     <value>홈 페이지로 이동</value>
   </data>
   <data name="ShowHomeButton" xml:space="preserve">
-    <value>주소 표시줄에 홈 버튼 표시</value>
+    <value>Show home button in address bar</value>
   </data>
   <data name="Toolbars" xml:space="preserve">
     <value>도구 모음</value>
@@ -3976,6 +3976,9 @@
   </data>
   <data name="BulkRename" xml:space="preserve">
     <value>이름 일괄 바꾸기</value>
+  </data>
+  <data name="CompressContents" xml:space="preserve">
+    <value>Compress contents</value>
   </data>
   <data name="ShowCreateAlternateDataStream" xml:space="preserve">
     <value>Show option to create alternate data stream</value>
@@ -4003,5 +4006,37 @@
   </data>
   <data name="ManageTags" xml:space="preserve">
     <value>Manage tags</value>
+  </data>
+  <data name="Available" xml:space="preserve">
+    <value>Available</value>
+  </data>
+  <data name="Total" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="AlwaysSwitchToNewlyOpenedTab" xml:space="preserve">
+    <value>Always switch focus to newly created tab</value>
+  </data>
+  <data name="ToggleShelfPane" xml:space="preserve">
+    <value>Toggle the shelf pane</value>
+  </data>
+  <data name="ToggleShelfPaneDescription" xml:space="preserve">
+    <value>Toggle the shelf pane visibility</value>
+  </data>
+  <data name="ShowShelfPaneButtonInAddressBar" xml:space="preserve">
+    <value>Show shelf pane toggle in address bar</value>
+  </data>
+  <data name="Shelf" xml:space="preserve">
+    <value>Shelf</value>
+    <comment>'Shelf' refers to the Shelf Pane feature, where users can conveniently drag and drop files for quick access and perform bulk actions with ease.</comment>
+  </data>
+  <data name="ClearItems" xml:space="preserve">
+    <value>Clear items</value>
+  </data>
+  <data name="RemoveFromShelf" xml:space="preserve">
+    <value>Remove from shelf</value>
+  </data>
+  <data name="AddToShelf" xml:space="preserve">
+    <value>Add to shelf</value>
+    <comment>Tooltip that displays when dragging items to the Shelf Pane</comment>
   </data>
 </root>

@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+﻿// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 using Windows.ApplicationModel.DataTransfer;
 
 namespace Files.App.Actions
 {
-	internal sealed class CutItemAction : BaseTransferItemAction, IAction
+	internal sealed partial class CutItemAction : BaseTransferItemAction, IAction
 	{
 		public string Label
 			=> "Cut".GetLocalizedResource();

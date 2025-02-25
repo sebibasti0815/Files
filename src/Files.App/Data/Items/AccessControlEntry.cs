@@ -1,12 +1,12 @@
-// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 namespace Files.App.Data.Items
 {
 	/// <summary>
 	/// Represents an access control entry (ACE).
 	/// </summary>
-	public sealed class AccessControlEntry : ObservableObject
+	public sealed partial class AccessControlEntry : ObservableObject
 	{
 		/// <summary>
 		/// Whether the path indicates folder or not

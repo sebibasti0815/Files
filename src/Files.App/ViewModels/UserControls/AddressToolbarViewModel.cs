@@ -1,7 +1,7 @@
-// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+// Copyright (c) Files Community
+// Licensed under the MIT License.
 
-using CommunityToolkit.WinUI.UI;
+using CommunityToolkit.WinUI;
 using Files.Shared.Helpers;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
@@ -16,12 +16,13 @@ using FocusManager = Microsoft.UI.Xaml.Input.FocusManager;
 
 namespace Files.App.ViewModels.UserControls
 {
-	public sealed class AddressToolbarViewModel : ObservableObject, IAddressToolbarViewModel, IDisposable
+	public sealed partial class AddressToolbarViewModel : ObservableObject, IAddressToolbarViewModel, IDisposable
 	{
 		private const int MAX_SUGGESTIONS = 10;
 
 		private IUserSettingsService UserSettingsService { get; } = Ioc.Default.GetRequiredService<IUserSettingsService>();
 		private IAppearanceSettingsService AppearanceSettingsService { get; } = Ioc.Default.GetRequiredService<IAppearanceSettingsService>();
+		private IGeneralSettingsService GeneralSettingsService { get; } = Ioc.Default.GetRequiredService<IGeneralSettingsService>();
 
 		private readonly IDialogService _dialogService = Ioc.Default.GetRequiredService<IDialogService>();
 
@@ -33,7 +34,7 @@ namespace Files.App.ViewModels.UserControls
 
 		public delegate void ToolbarPathItemInvokedEventHandler(object sender, PathNavigationEventArgs e);
 
-		public delegate void ToolbarFlyoutOpenedEventHandler(object sender, ToolbarFlyoutOpenedEventArgs e);
+		public delegate void ToolbarFlyoutOpeningEventHandler(object sender, ToolbarFlyoutOpeningEventArgs e);
 
 		public delegate void ToolbarPathItemLoadedEventHandler(object sender, ToolbarPathItemLoadedEventArgs e);
 
@@ -43,7 +44,7 @@ namespace Files.App.ViewModels.UserControls
 
 		public event ToolbarPathItemInvokedEventHandler? ToolbarPathItemInvoked;
 
-		public event ToolbarFlyoutOpenedEventHandler? ToolbarFlyoutOpened;
+		public event ToolbarFlyoutOpeningEventHandler? ToolbarFlyoutOpening;
 
 		public event ToolbarPathItemLoadedEventHandler? ToolbarPathItemLoaded;
 
@@ -56,8 +57,6 @@ namespace Files.App.ViewModels.UserControls
 		public event AddressBarTextEnteredEventHandler? AddressBarTextEntered;
 
 		public event PathBoxItemDroppedEventHandler? PathBoxItemDropped;
-
-		public event EventHandler? RefreshRequested;
 
 		public event EventHandler? RefreshWidgetsRequested;
 
@@ -162,6 +161,9 @@ namespace Files.App.ViewModels.UserControls
 		public bool ShowHomeButton
 			=> AppearanceSettingsService.ShowHomeButton;
 
+		public bool ShowShelfPaneToggleButton
+			=> AppearanceSettingsService.ShowShelfPaneToggleButton && AppLifecycleHelper.AppEnvironment is AppEnvironment.Dev;
+
 		public ObservableCollection<NavigationBarSuggestionItem> NavigationBarSuggestions = [];
 
 		private CurrentInstanceViewModel instanceViewModel;
@@ -197,8 +199,6 @@ namespace Files.App.ViewModels.UserControls
 
 		public AddressToolbarViewModel()
 		{
-			RefreshClickCommand = new RelayCommand<RoutedEventArgs>(e => RefreshRequested?.Invoke(this, EventArgs.Empty));
-
 			dispatcherQueue = DispatcherQueue.GetForCurrentThread();
 			dragOverTimer = dispatcherQueue.CreateTimer();
 
@@ -213,6 +213,9 @@ namespace Files.App.ViewModels.UserControls
 					case nameof(AppearanceSettingsService.ShowHomeButton):
 						OnPropertyChanged(nameof(ShowHomeButton));
 						break;
+					case nameof(AppearanceSettingsService.ShowShelfPaneToggleButton):
+						OnPropertyChanged(nameof(ShowShelfPaneToggleButton));
+						break;
 				}
 			};
 		}
@@ -221,11 +224,6 @@ namespace Files.App.ViewModels.UserControls
 		{
 			IsUpdateAvailable = UpdateService.IsUpdateAvailable;
 			IsUpdating = UpdateService.IsUpdating;
-		}
-
-		public void RefreshWidgets()
-		{
-			RefreshWidgetsRequested?.Invoke(this, EventArgs.Empty);
 		}
 
 		private void UserSettingsService_OnSettingChangedEvent(object? sender, SettingChangedEventArgs e)
@@ -244,6 +242,7 @@ namespace Files.App.ViewModels.UserControls
 				case nameof(UserSettingsService.LayoutSettingsService.DetailsViewSize):
 				case nameof(UserSettingsService.LayoutSettingsService.ListViewSize):
 				case nameof(UserSettingsService.LayoutSettingsService.ColumnsViewSize):
+				case nameof(UserSettingsService.LayoutSettingsService.CardsViewSize):
 				case nameof(UserSettingsService.LayoutSettingsService.GridViewSize):
 					OnPropertyChanged(nameof(IsLayoutSizeCompact));
 					OnPropertyChanged(nameof(IsLayoutSizeSmall));
@@ -382,13 +381,13 @@ namespace Files.App.ViewModels.UserControls
 					x.Item is ZipStorageFolder) ||
 					ZipStorageFolder.IsZipPath(pathBoxItem.Path))
 			{
-				e.DragUIOverride.Caption = string.Format("CopyToFolderCaptionText".GetLocalizedResource(), pathBoxItem.Title);
+				e.DragUIOverride.Caption = string.Format(Strings.CopyToFolderCaptionText.GetLocalizedResource(), pathBoxItem.Title);
 				e.AcceptedOperation = DataPackageOperation.Copy;
 			}
 			else
 			{
 				e.DragUIOverride.IsCaptionVisible = true;
-				e.DragUIOverride.Caption = string.Format("MoveToFolderCaptionText".GetLocalizedResource(), pathBoxItem.Title);
+				e.DragUIOverride.Caption = string.Format(Strings.MoveToFolderCaptionText.GetLocalizedResource(), pathBoxItem.Title);
 				// Some applications such as Edge can't raise the drop event by the Move flag (#14008), so we set the Copy flag as well.
 				e.AcceptedOperation = DataPackageOperation.Move | DataPackageOperation.Copy;
 			}
@@ -441,8 +440,6 @@ namespace Files.App.ViewModels.UserControls
 			set => SetProperty(ref pathControlDisplayText, value);
 		}
 
-		public ICommand RefreshClickCommand { get; }
-
 		public void PathItemSeparator_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
 		{
 			var pathSeparatorIcon = sender as FontIcon;
@@ -456,9 +453,9 @@ namespace Files.App.ViewModels.UserControls
 			});
 		}
 
-		public void PathboxItemFlyout_Opened(object sender, object e)
+		public void PathboxItemFlyout_Opening(object sender, object e)
 		{
-			ToolbarFlyoutOpened?.Invoke(this, new ToolbarFlyoutOpenedEventArgs() { OpenedFlyout = (MenuFlyout)sender });
+			ToolbarFlyoutOpening?.Invoke(this, new ToolbarFlyoutOpeningEventArgs((MenuFlyout)sender));
 		}
 
 		public void PathBoxItemFlyout_Closed(object sender, object e)
@@ -518,14 +515,32 @@ namespace Files.App.ViewModels.UserControls
 			});
 		}
 
-		public void PathBoxItem_KeyDown(object sender, KeyRoutedEventArgs e)
+		public void PathBoxItem_PreviewKeyDown(object sender, KeyRoutedEventArgs e)
 		{
-			if (e.Key == Windows.System.VirtualKey.Down)
+			switch (e.Key)
 			{
-				var item = e.OriginalSource as ListViewItem;
-				var button = item?.FindDescendant<Button>();
-				button?.Flyout.ShowAt(button);
-				e.Handled = true;
+				case Windows.System.VirtualKey.Down:
+				{
+					var item = e.OriginalSource as ListViewItem;
+					var button = item?.FindDescendant<Button>();
+					button?.Flyout.ShowAt(button);
+					e.Handled = true;
+					break;
+				}
+				case Windows.System.VirtualKey.Space: 
+				case Windows.System.VirtualKey.Enter:
+				{
+					var item = e.OriginalSource as ListViewItem;
+					var path = (item?.Content as PathBoxItem)?.Path;
+					if (path == PathControlDisplayText)
+						return;
+					ToolbarPathItemInvoked?.Invoke(this, new PathNavigationEventArgs()
+					{
+						ItemPath = path
+					});
+					e.Handled = true;
+					break;
+				}
 			}
 		}
 
@@ -633,7 +648,7 @@ namespace Files.App.ViewModels.UserControls
 				var flyoutItem = new MenuFlyoutItem
 				{
 					Icon = new FontIcon { Glyph = "\uE7BA" },
-					Text = "SubDirectoryAccessDenied".GetLocalizedResource(),
+					Text = Strings.SubDirectoryAccessDenied.GetLocalizedResource(),
 					//Foreground = (SolidColorBrush)Application.Current.Resources["SystemControlErrorTextForegroundBrush"],
 					FontSize = 12
 				};
@@ -651,11 +666,9 @@ namespace Files.App.ViewModels.UserControls
 
 			foreach (var childFolder in childFolders)
 			{
-				var imageSource = await NavigationHelpers.GetIconForPathAsync(childFolder.Path);
-
 				var flyoutItem = new MenuFlyoutItem
 				{
-					Icon = new ImageIcon() { Source = imageSource },
+					Icon = new FontIcon { Glyph = "\uE8B7" }, // Use font icon as placeholder
 					Text = childFolder.Item.Name,
 					FontSize = 12,
 				};
@@ -670,8 +683,20 @@ namespace Files.App.ViewModels.UserControls
 				}
 
 				flyout.Items?.Add(flyoutItem);
+
+				// Start loading the thumbnail in the background
+				_ = LoadFlyoutItemIconAsync(flyoutItem, childFolder.Path);
 			}
 		}
+
+		private async Task LoadFlyoutItemIconAsync(MenuFlyoutItem flyoutItem, string path)
+		{
+			var imageSource = await NavigationHelpers.GetIconForPathAsync(path);
+
+			if (imageSource is not null)
+				flyoutItem.Icon = new ImageIcon { Source = imageSource };
+		}
+
 
 		private static string NormalizePathInput(string currentInput, bool isFtp)
 		{
@@ -694,11 +719,11 @@ namespace Files.App.ViewModels.UserControls
 				var command = Commands[code];
 
 				if (command == Commands.None)
-					await DialogDisplayHelper.ShowDialogAsync("InvalidCommand".GetLocalizedResource(),
-						string.Format("InvalidCommandContent".GetLocalizedResource(), code));
+					await DialogDisplayHelper.ShowDialogAsync(Strings.InvalidCommand.GetLocalizedResource(),
+						string.Format(Strings.InvalidCommandContent.GetLocalizedResource(), code));
 				else if (!command.IsExecutable)
-					await DialogDisplayHelper.ShowDialogAsync("CommandNotExecutable".GetLocalizedResource(),
-						string.Format("CommandNotExecutableContent".GetLocalizedResource(), command.Code));
+					await DialogDisplayHelper.ShowDialogAsync(Strings.CommandNotExecutable.GetLocalizedResource(),
+						string.Format(Strings.CommandNotExecutableContent.GetLocalizedResource(), command.Code));
 				else
 					await command.ExecuteAsync();
 
@@ -714,7 +739,7 @@ namespace Files.App.ViewModels.UserControls
 
 			if (normalizedInput != shellPage.ShellViewModel.WorkingDirectory || shellPage.CurrentPageType == typeof(HomePage))
 			{
-				if (normalizedInput.Equals("Home", StringComparison.OrdinalIgnoreCase) || normalizedInput.Equals("Home".GetLocalizedResource(), StringComparison.OrdinalIgnoreCase))
+				if (normalizedInput.Equals("Home", StringComparison.OrdinalIgnoreCase) || normalizedInput.Equals(Strings.Home.GetLocalizedResource(), StringComparison.OrdinalIgnoreCase))
 				{
 					SavePathToHistory("Home");
 					shellPage.NavigateHome();
@@ -733,7 +758,7 @@ namespace Files.App.ViewModels.UserControls
 						var matchingDrive = drivesViewModel.Drives.Cast<DriveItem>().FirstOrDefault(x => PathNormalization.NormalizePath(normalizedInput).StartsWith(PathNormalization.NormalizePath(x.Path), StringComparison.Ordinal));
 						if (matchingDrive is not null && matchingDrive.Type == Data.Items.DriveType.CDRom && matchingDrive.MaxSpace == ByteSizeLib.ByteSize.FromBytes(0))
 						{
-							bool ejectButton = await DialogDisplayHelper.ShowDialogAsync("InsertDiscDialog/Title".GetLocalizedResource(), string.Format("InsertDiscDialog/Text".GetLocalizedResource(), matchingDrive.Path), "InsertDiscDialog/OpenDriveButton".GetLocalizedResource(), "Close".GetLocalizedResource());
+							bool ejectButton = await DialogDisplayHelper.ShowDialogAsync(Strings.InsertDiscDialog_Title.GetLocalizedResource(), string.Format(Strings.InsertDiscDialog_Text.GetLocalizedResource(), matchingDrive.Path), Strings.InsertDiscDialog_OpenDriveButton.GetLocalizedResource(), Strings.Close.GetLocalizedResource());
 							if (ejectButton)
 								DriveHelpers.EjectDeviceAsync(matchingDrive.Path);
 							return;
@@ -769,13 +794,13 @@ namespace Files.App.ViewModels.UserControls
 							try
 							{
 								if (!await Windows.System.Launcher.LaunchUriAsync(new Uri(currentInput)))
-									await DialogDisplayHelper.ShowDialogAsync("InvalidItemDialogTitle".GetLocalizedResource(),
-										string.Format("InvalidItemDialogContent".GetLocalizedResource(), Environment.NewLine, resFolder.ErrorCode.ToString()));
+									await DialogDisplayHelper.ShowDialogAsync(Strings.InvalidItemDialogTitle.GetLocalizedResource(),
+										string.Format(Strings.InvalidItemDialogContent.GetLocalizedResource(), Environment.NewLine, resFolder.ErrorCode.ToString()));
 							}
 							catch (Exception ex) when (ex is UriFormatException || ex is ArgumentException)
 							{
-								await DialogDisplayHelper.ShowDialogAsync("InvalidItemDialogTitle".GetLocalizedResource(),
-									string.Format("InvalidItemDialogContent".GetLocalizedResource(), Environment.NewLine, resFolder.ErrorCode.ToString()));
+								await DialogDisplayHelper.ShowDialogAsync(Strings.InvalidItemDialogTitle.GetLocalizedResource(),
+									string.Format(Strings.InvalidItemDialogContent.GetLocalizedResource(), Environment.NewLine, resFolder.ErrorCode.ToString()));
 							}
 						}
 					}
@@ -889,7 +914,7 @@ namespace Files.App.ViewModels.UserControls
 					{
 						suggestions = new List<NavigationBarSuggestionItem>() { new NavigationBarSuggestionItem() {
 						Text = shellpage.ShellViewModel.WorkingDirectory,
-						PrimaryDisplay = "NavigationToolbarVisiblePathNoResults".GetLocalizedResource() } };
+						PrimaryDisplay = Strings.NavigationToolbarVisiblePathNoResults.GetLocalizedResource() } };
 					}
 
 					// NavigationBarSuggestions becoming empty causes flickering of the suggestion box
@@ -942,7 +967,7 @@ namespace Files.App.ViewModels.UserControls
 						NavigationBarSuggestions.Add(new NavigationBarSuggestionItem()
 						{
 							Text = shellpage.ShellViewModel.WorkingDirectory,
-							PrimaryDisplay = "NavigationToolbarVisiblePathNoResults".GetLocalizedResource()
+							PrimaryDisplay = Strings.NavigationToolbarVisiblePathNoResults.GetLocalizedResource()
 						});
 					});
 				}
@@ -957,12 +982,12 @@ namespace Files.App.ViewModels.UserControls
 					LayoutThemedIcon = instanceViewModel.FolderSettings.LayoutMode switch
 					{
 						FolderLayoutModes.ListView => Commands.LayoutList.ThemedIconStyle!,
-						FolderLayoutModes.TilesView => Commands.LayoutTiles.ThemedIconStyle!,
+						FolderLayoutModes.CardsView => Commands.LayoutCards.ThemedIconStyle!,
 						FolderLayoutModes.ColumnView => Commands.LayoutColumns.ThemedIconStyle!,
 						FolderLayoutModes.GridView => Commands.LayoutGrid.ThemedIconStyle!,
 						_ => Commands.LayoutDetails.ThemedIconStyle!
 					};
-					OnPropertyChanged(nameof(IsTilesLayout));
+					OnPropertyChanged(nameof(IsCardsLayout));
 					OnPropertyChanged(nameof(IsListLayout));
 					OnPropertyChanged(nameof(IsColumnLayout));
 					OnPropertyChanged(nameof(IsGridLayout));
@@ -1020,7 +1045,7 @@ namespace Files.App.ViewModels.UserControls
 		public bool IsInfFile => SelectedItems is not null && SelectedItems.Count == 1 && FileExtensionHelpers.IsInfFile(SelectedItems.First().FileExtension) && !InstanceViewModel.IsPageTypeRecycleBin;
 		public bool IsFont => SelectedItems is not null && SelectedItems.Any() && SelectedItems.All(x => FileExtensionHelpers.IsFontFile(x.FileExtension)) && !InstanceViewModel.IsPageTypeRecycleBin;
 
-		public bool IsTilesLayout => instanceViewModel.FolderSettings.LayoutMode is FolderLayoutModes.TilesView;
+		public bool IsCardsLayout => instanceViewModel.FolderSettings.LayoutMode is FolderLayoutModes.CardsView;
 		public bool IsColumnLayout => instanceViewModel.FolderSettings.LayoutMode is FolderLayoutModes.ColumnView;
 		public bool IsGridLayout => instanceViewModel.FolderSettings.LayoutMode is FolderLayoutModes.GridView;
 		public bool IsDetailsLayout => instanceViewModel.FolderSettings.LayoutMode is FolderLayoutModes.DetailsView;
@@ -1035,28 +1060,32 @@ namespace Files.App.ViewModels.UserControls
 			(IsDetailsLayout && UserSettingsService.LayoutSettingsService.DetailsViewSize == DetailsViewSizeKind.Small) ||
 			(IsListLayout && UserSettingsService.LayoutSettingsService.ListViewSize == ListViewSizeKind.Small) ||
 			(IsColumnLayout && UserSettingsService.LayoutSettingsService.ColumnsViewSize == ColumnsViewSizeKind.Small) ||
+			(IsCardsLayout && UserSettingsService.LayoutSettingsService.CardsViewSize == CardsViewSizeKind.Small) ||
 			(IsGridLayout && UserSettingsService.LayoutSettingsService.GridViewSize == GridViewSizeKind.Small);
 
 		public bool IsLayoutSizeMedium =>
 			(IsDetailsLayout && UserSettingsService.LayoutSettingsService.DetailsViewSize == DetailsViewSizeKind.Medium) ||
 			(IsListLayout && UserSettingsService.LayoutSettingsService.ListViewSize == ListViewSizeKind.Medium) ||
 			(IsColumnLayout && UserSettingsService.LayoutSettingsService.ColumnsViewSize == ColumnsViewSizeKind.Medium) ||
+			(IsCardsLayout && UserSettingsService.LayoutSettingsService.CardsViewSize == CardsViewSizeKind.Medium) ||
 			(IsGridLayout && UserSettingsService.LayoutSettingsService.GridViewSize == GridViewSizeKind.Medium);
 
 		public bool IsLayoutSizeLarge =>
 			(IsDetailsLayout && UserSettingsService.LayoutSettingsService.DetailsViewSize == DetailsViewSizeKind.Large) ||
 			(IsListLayout && UserSettingsService.LayoutSettingsService.ListViewSize == ListViewSizeKind.Large) ||
 			(IsColumnLayout && UserSettingsService.LayoutSettingsService.ColumnsViewSize == ColumnsViewSizeKind.Large) ||
+			(IsCardsLayout && UserSettingsService.LayoutSettingsService.CardsViewSize == CardsViewSizeKind.Large) ||
 			(IsGridLayout && UserSettingsService.LayoutSettingsService.GridViewSize == GridViewSizeKind.Large);
 
 		public bool IsLayoutSizeExtraLarge =>
 			(IsDetailsLayout && UserSettingsService.LayoutSettingsService.DetailsViewSize == DetailsViewSizeKind.ExtraLarge) ||
 			(IsListLayout && UserSettingsService.LayoutSettingsService.ListViewSize == ListViewSizeKind.ExtraLarge) ||
 			(IsColumnLayout && UserSettingsService.LayoutSettingsService.ColumnsViewSize == ColumnsViewSizeKind.ExtraLarge) ||
+			(IsCardsLayout && UserSettingsService.LayoutSettingsService.CardsViewSize == CardsViewSizeKind.ExtraLarge) ||
 			(IsGridLayout && UserSettingsService.LayoutSettingsService.GridViewSize == GridViewSizeKind.ExtraLarge);
 
 		public string ExtractToText
-			=> IsSelectionArchivesOnly ? SelectedItems.Count > 1 ? string.Format("ExtractToChildFolder".GetLocalizedResource(), $"*{Path.DirectorySeparatorChar}") : string.Format("ExtractToChildFolder".GetLocalizedResource() + "\\", Path.GetFileNameWithoutExtension(selectedItems.First().Name)) : "ExtractToChildFolder".GetLocalizedResource();
+			=> IsSelectionArchivesOnly ? SelectedItems.Count > 1 ? string.Format(Strings.ExtractToChildFolder.GetLocalizedResource(), $"*{Path.DirectorySeparatorChar}") : string.Format(Strings.ExtractToChildFolder.GetLocalizedResource() + "\\", Path.GetFileNameWithoutExtension(selectedItems.First().Name)) : Strings.ExtractToChildFolder.GetLocalizedResource();
 
 		public void Dispose()
 		{

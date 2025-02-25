@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+﻿// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 using Microsoft.UI.Windowing;
 
 namespace Files.App.Actions
 {
-	internal sealed class ExitCompactOverlayAction : ObservableObject, IAction
+	internal sealed partial class ExitCompactOverlayAction : ObservableObject, IAction
 	{
 		private readonly IWindowContext windowContext;
 

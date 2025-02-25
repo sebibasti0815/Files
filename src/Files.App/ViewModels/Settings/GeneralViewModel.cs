@@ -1,5 +1,5 @@
-// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 using System.Collections.Specialized;
 using Windows.Storage;
@@ -9,7 +9,7 @@ using DispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue;
 
 namespace Files.App.ViewModels.Settings
 {
-	public sealed class GeneralViewModel : ObservableObject, IDisposable
+	public sealed partial class GeneralViewModel : ObservableObject, IDisposable
 	{
 		private IUserSettingsService UserSettingsService { get; } = Ioc.Default.GetRequiredService<IUserSettingsService>();
 		private ICommonDialogService CommonDialogService { get; } = Ioc.Default.GetRequiredService<ICommonDialogService>();

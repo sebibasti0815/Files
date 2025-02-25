@@ -1,9 +1,9 @@
-// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+// Copyright (c) Files Community
+// Licensed under the MIT License.
 
+using CommunityToolkit.WinUI;
 using CommunityToolkit.WinUI.Helpers;
-using CommunityToolkit.WinUI.UI;
-using CommunityToolkit.WinUI.UI.Controls;
+using CommunityToolkit.WinUI.Controls;
 using Files.App.UserControls.Sidebar;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
@@ -18,6 +18,7 @@ using Windows.Graphics;
 using Windows.Services.Store;
 using WinRT.Interop;
 using VirtualKey = Windows.System.VirtualKey;
+using GridSplitter = Files.App.Controls.GridSplitter;
 
 namespace Files.App.Views
 {
@@ -235,13 +236,19 @@ namespace Files.App.Views
 				default:
 					var currentModifiers = HotKeyHelpers.GetCurrentKeyModifiers();
 					HotKey hotKey = new((Keys)e.Key, currentModifiers);
+					var source = e.OriginalSource as DependencyObject;
 
 					// A textbox takes precedence over certain hotkeys.
-					if (e.OriginalSource is DependencyObject source && source.FindAscendantOrSelf<TextBox>() is not null)
+					if (source?.FindAscendantOrSelf<TextBox>() is not null)
 						break;
 
 					// Execute command for hotkey
 					var command = Commands[hotKey];
+
+					if (command.Code is CommandCodes.OpenItem && source?.FindAscendantOrSelf<PathBreadcrumb>() is not null)
+						break;
+					
+
 					if (command.Code is not CommandCodes.None && keyReleased)
 					{
 						keyReleased = false;
@@ -305,7 +312,7 @@ namespace Files.App.Views
 			if (Package.Current.Id.Name != "49306atecsolution.FilesUWP" || UserSettingsService.ApplicationSettingsService.ClickedToReviewApp)
 				return;
 
-			var totalLaunchCount = SystemInformation.Instance.TotalLaunchCount;
+			var totalLaunchCount = AppLifecycleHelper.TotalLaunchCount;
 			if (totalLaunchCount is 50 or 200)
 			{
 				// Prompt user to review app in the Store
@@ -484,7 +491,7 @@ namespace Files.App.Views
 
 		private void PaneSplitter_ManipulationStarted(object sender, ManipulationStartedRoutedEventArgs e)
 		{
-			this.ChangeCursor(InputSystemCursor.Create(PaneSplitter.GripperCursor == GridSplitter.GripperCursorType.SizeWestEast ?
+			this.ChangeCursor(InputSystemCursor.Create(InfoPane.Position == PreviewPanePositions.Right ?
 				InputSystemCursorShape.SizeWestEast : InputSystemCursorShape.SizeNorthSouth));
 		}
 	}

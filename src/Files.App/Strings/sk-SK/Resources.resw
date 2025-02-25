@@ -1060,9 +1060,6 @@
   <data name="NavToolbarDetails.ToolTipService.ToolTip" xml:space="preserve">
     <value>Detaily (Ctrl+Shift+1)</value>
   </data>
-  <data name="NavToolbarTiles.ToolTipService.ToolTip" xml:space="preserve">
-    <value>Dlaždice (Ctrl+Shift+2)</value>
-  </data>
   <data name="DateDeleted" xml:space="preserve">
     <value>Odstránené</value>
   </data>
@@ -1660,15 +1657,6 @@
   <data name="Home" xml:space="preserve">
     <value>Domov</value>
   </data>
-  <data name="BaseLayoutContextFlyoutDetails.KeyboardAcceleratorTextOverride" xml:space="preserve">
-    <value>Ctrl+Shift+1</value>
-  </data>
-  <data name="BaseLayoutContextFlyoutTiles.KeyboardAcceleratorTextOverride" xml:space="preserve">
-    <value>Ctrl+Shift+2</value>
-  </data>
-  <data name="BaseLayoutContextFlyoutColumn.KeyboardAcceleratorTextOverride" xml:space="preserve">
-    <value>Ctrl+Shift+6</value>
-  </data>
   <data name="ArchiveExtractionCompletedSuccessfullyText" xml:space="preserve">
     <value>Rozbalenie archívu bolo úspešne dokončené.</value>
   </data>
@@ -1726,8 +1714,8 @@
   <data name="Columns" xml:space="preserve">
     <value>Stĺpce</value>
   </data>
-  <data name="Tiles" xml:space="preserve">
-    <value>Dlaždice</value>
+  <data name="Cards" xml:space="preserve">
+    <value>Cards</value>
   </data>
   <data name="OpenFoldersInNewTab" xml:space="preserve">
     <value>Otvoriť priečinky na novej karte</value>
@@ -1839,6 +1827,18 @@
   </data>
   <data name="CompatibilityRegisterThisProgramForRestart" xml:space="preserve">
     <value>Register this program for restart</value>
+  </data>
+  <data name="StartWindow" xml:space="preserve">
+    <value>Start window</value>
+  </data>
+  <data name="NormalWindow" xml:space="preserve">
+    <value>Normal window</value>
+  </data>
+  <data name="Minimized" xml:space="preserve">
+    <value>Minimized</value>
+  </data>
+  <data name="Maximized" xml:space="preserve">
+    <value>Maximized</value>
   </data>
   <data name="RunAsAdministrator" xml:space="preserve">
     <value>Spustiť ako správca</value>
@@ -2196,6 +2196,9 @@
   </data>
   <data name="WhatsNew" xml:space="preserve">
     <value>Čo je nové</value>
+  </data>
+  <data name="WhatsNewDescription" xml:space="preserve">
+    <value>Open Release Notes</value>
   </data>
   <data name="CannotCreateShortcutDialogTitle" xml:space="preserve">
     <value>Vytvorenie odkazu na tomto mieste vyžaduje administrátorské oprávnenia</value>
@@ -2572,8 +2575,8 @@
   <data name="LayoutDetailsDescription" xml:space="preserve">
     <value>Prepnuť na zobrazenie podrobností</value>
   </data>
-  <data name="LayoutTilesDescription" xml:space="preserve">
-    <value>Switch to tiles view</value>
+  <data name="LayoutCardsDescription" xml:space="preserve">
+    <value>Switch to cards view</value>
   </data>
   <data name="LayoutListDescription" xml:space="preserve">
     <value>Prepnúť na zobrazenie zoznamu</value>
@@ -3713,9 +3716,6 @@
   <data name="QuestionsAndDiscussions" xml:space="preserve">
     <value>Questions &amp; discussions</value>
   </data>
-  <data name="TilesViewSizeInfo" xml:space="preserve">
-    <value>Additional sizes are not yet available for the Tiles View.</value>
-  </data>
   <data name="Compact" xml:space="preserve">
     <value>Compact</value>
     <comment>Used to describe layout sizes</comment>
@@ -3968,7 +3968,7 @@
     <value>Navigate to the home page</value>
   </data>
   <data name="ShowHomeButton" xml:space="preserve">
-    <value>Show Home in address bar</value>
+    <value>Show home button in address bar</value>
   </data>
   <data name="Toolbars" xml:space="preserve">
     <value>Toolbars</value>
@@ -3978,6 +3978,9 @@
   </data>
   <data name="BulkRename" xml:space="preserve">
     <value>Bulk rename</value>
+  </data>
+  <data name="CompressContents" xml:space="preserve">
+    <value>Compress contents</value>
   </data>
   <data name="ShowCreateAlternateDataStream" xml:space="preserve">
     <value>Show option to create alternate data stream</value>
@@ -4005,5 +4008,37 @@
   </data>
   <data name="ManageTags" xml:space="preserve">
     <value>Manage tags</value>
+  </data>
+  <data name="Available" xml:space="preserve">
+    <value>Available</value>
+  </data>
+  <data name="Total" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="AlwaysSwitchToNewlyOpenedTab" xml:space="preserve">
+    <value>Always switch focus to newly created tab</value>
+  </data>
+  <data name="ToggleShelfPane" xml:space="preserve">
+    <value>Toggle the shelf pane</value>
+  </data>
+  <data name="ToggleShelfPaneDescription" xml:space="preserve">
+    <value>Toggle the shelf pane visibility</value>
+  </data>
+  <data name="ShowShelfPaneButtonInAddressBar" xml:space="preserve">
+    <value>Show shelf pane toggle in address bar</value>
+  </data>
+  <data name="Shelf" xml:space="preserve">
+    <value>Shelf</value>
+    <comment>'Shelf' refers to the Shelf Pane feature, where users can conveniently drag and drop files for quick access and perform bulk actions with ease.</comment>
+  </data>
+  <data name="ClearItems" xml:space="preserve">
+    <value>Clear items</value>
+  </data>
+  <data name="RemoveFromShelf" xml:space="preserve">
+    <value>Remove from shelf</value>
+  </data>
+  <data name="AddToShelf" xml:space="preserve">
+    <value>Add to shelf</value>
+    <comment>Tooltip that displays when dragging items to the Shelf Pane</comment>
   </data>
 </root>

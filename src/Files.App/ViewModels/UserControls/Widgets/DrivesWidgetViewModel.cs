@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+﻿// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml.Controls;
@@ -13,7 +13,7 @@ namespace Files.App.ViewModels.UserControls.Widgets
 	/// <summary>
 	/// Represents view model of <see cref="DrivesWidget"/>.
 	/// </summary>
-	public sealed class DrivesWidgetViewModel : BaseWidgetViewModel, IWidgetViewModel
+	public sealed partial class DrivesWidgetViewModel : BaseWidgetViewModel, IWidgetViewModel
 	{
 		// Properties
 

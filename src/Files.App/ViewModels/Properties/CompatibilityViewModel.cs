@@ -1,5 +1,5 @@
-// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 using System.Windows.Input;
 
@@ -8,7 +8,7 @@ namespace Files.App.ViewModels.Properties
 	/// <summary>
 	/// Represents view model of <see cref="Views.Properties.CompatibilityPage"/>.
 	/// </summary>
-	public sealed class CompatibilityViewModel : ObservableObject
+	public sealed partial class CompatibilityViewModel : ObservableObject
 	{
 		// Dependency injections
 
@@ -81,7 +81,7 @@ namespace Files.App.ViewModels.Properties
 
 		public CompatibilityViewModel(ListedItem item)
 		{
-			ItemPath = item is ShortcutItem shortcutItem ? shortcutItem.TargetPath : item.ItemPath;
+			ItemPath = item is IShortcutItem shortcutItem ? shortcutItem.TargetPath : item.ItemPath;
 
 			CompatibilityOptions = WindowsCompatibilityService.GetCompatibilityOptionsForPath(ItemPath);
 

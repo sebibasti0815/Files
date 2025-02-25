@@ -1,5 +1,5 @@
-// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 using Files.App.Controls;
 using Microsoft.UI.Xaml;
@@ -11,7 +11,7 @@ using ByteSize = ByteSizeLib.ByteSize;
 
 namespace Files.App.Data.Items
 {
-	public sealed class DriveItem : ObservableObject, INavigationControlItem, ILocatableFolder
+	public sealed partial class DriveItem : ObservableObject, INavigationControlItem, ILocatableFolder
 	{
 		private BitmapImage icon;
 		public BitmapImage Icon

@@ -1,5 +1,5 @@
-// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 using CommunityToolkit.WinUI;
 using Microsoft.UI.Xaml;
@@ -8,7 +8,7 @@ using Windows.Win32.Foundation;
 
 namespace Files.App.ViewModels.Properties
 {
-	public sealed class SecurityViewModel : ObservableObject
+	public sealed partial class SecurityViewModel : ObservableObject
 	{
 		private readonly IStorageSecurityService StorageSecurityService = Ioc.Default.GetRequiredService<IStorageSecurityService>();
 

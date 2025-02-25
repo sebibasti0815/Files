@@ -1058,9 +1058,6 @@
   <data name="NavToolbarDetails.ToolTipService.ToolTip" xml:space="preserve">
     <value>Dettagli (Ctrl + Shift + 1)</value>
   </data>
-  <data name="NavToolbarTiles.ToolTipService.ToolTip" xml:space="preserve">
-    <value>Riquadri (Ctrl + Shift + 2)</value>
-  </data>
   <data name="DateDeleted" xml:space="preserve">
     <value>Data di eliminazione</value>
   </data>
@@ -1658,15 +1655,6 @@
   <data name="Home" xml:space="preserve">
     <value>Home</value>
   </data>
-  <data name="BaseLayoutContextFlyoutDetails.KeyboardAcceleratorTextOverride" xml:space="preserve">
-    <value>Ctrl+Maiusc+1</value>
-  </data>
-  <data name="BaseLayoutContextFlyoutTiles.KeyboardAcceleratorTextOverride" xml:space="preserve">
-    <value>Ctrl+Maiusc+2</value>
-  </data>
-  <data name="BaseLayoutContextFlyoutColumn.KeyboardAcceleratorTextOverride" xml:space="preserve">
-    <value>Ctrl+Maiusc+6</value>
-  </data>
   <data name="ArchiveExtractionCompletedSuccessfullyText" xml:space="preserve">
     <value>Estrazione archivio completata con successo.</value>
   </data>
@@ -1724,8 +1712,8 @@
   <data name="Columns" xml:space="preserve">
     <value>Colonne</value>
   </data>
-  <data name="Tiles" xml:space="preserve">
-    <value>Riquadri</value>
+  <data name="Cards" xml:space="preserve">
+    <value>Schede</value>
   </data>
   <data name="OpenFoldersInNewTab" xml:space="preserve">
     <value>Apri le cartelle in una nuova scheda</value>
@@ -1837,6 +1825,18 @@
   </data>
   <data name="CompatibilityRegisterThisProgramForRestart" xml:space="preserve">
     <value>Registra questo programma per il riavvio</value>
+  </data>
+  <data name="StartWindow" xml:space="preserve">
+    <value>Finestra iniziale</value>
+  </data>
+  <data name="NormalWindow" xml:space="preserve">
+    <value>Finestra normale</value>
+  </data>
+  <data name="Minimized" xml:space="preserve">
+    <value>Minimizzato</value>
+  </data>
+  <data name="Maximized" xml:space="preserve">
+    <value>Massimizzato</value>
   </data>
   <data name="RunAsAdministrator" xml:space="preserve">
     <value>Esegui come amministratore</value>
@@ -2194,6 +2194,9 @@
   </data>
   <data name="WhatsNew" xml:space="preserve">
     <value>Novità</value>
+  </data>
+  <data name="WhatsNewDescription" xml:space="preserve">
+    <value>Apri note di rilascio</value>
   </data>
   <data name="CannotCreateShortcutDialogTitle" xml:space="preserve">
     <value>Creare un collegamento in questa posizione richiede i privilegi di amministratore</value>
@@ -2570,8 +2573,8 @@
   <data name="LayoutDetailsDescription" xml:space="preserve">
     <value>Passa alla visualizzazione dettagli</value>
   </data>
-  <data name="LayoutTilesDescription" xml:space="preserve">
-    <value>Passa alla visualizzazione riquadri</value>
+  <data name="LayoutCardsDescription" xml:space="preserve">
+    <value>Passa alla visualizzazione a schede</value>
   </data>
   <data name="LayoutListDescription" xml:space="preserve">
     <value>Passa alla visualizzazione elenco</value>
@@ -3079,7 +3082,7 @@
     <value>Cambia branch</value>
   </data>
   <data name="Branches" xml:space="preserve">
-    <value>Branches</value>
+    <value>Rami</value>
   </data>
   <data name="Switch" xml:space="preserve">
     <value>Cambia</value>
@@ -3711,9 +3714,6 @@
   <data name="QuestionsAndDiscussions" xml:space="preserve">
     <value>Domande e discussioni</value>
   </data>
-  <data name="TilesViewSizeInfo" xml:space="preserve">
-    <value>Le dimensioni aggiuntive non sono ancora disponibili per la visualizzazione Riquadri.</value>
-  </data>
   <data name="Compact" xml:space="preserve">
     <value>Compatta</value>
     <comment>Used to describe layout sizes</comment>
@@ -3966,7 +3966,7 @@
     <value>Vai alla pagina iniziale</value>
   </data>
   <data name="ShowHomeButton" xml:space="preserve">
-    <value>Mostra Home nella barra degli indirizzi</value>
+    <value>Mostra il pulsante Home nella barra degli strumenti</value>
   </data>
   <data name="Toolbars" xml:space="preserve">
     <value>Barre degli strumenti</value>
@@ -3976,6 +3976,9 @@
   </data>
   <data name="BulkRename" xml:space="preserve">
     <value>Rinomina in blocco</value>
+  </data>
+  <data name="CompressContents" xml:space="preserve">
+    <value>Comprimi contenuti</value>
   </data>
   <data name="ShowCreateAlternateDataStream" xml:space="preserve">
     <value>Mostra l'opzione per creare un flusso dati alternativo</value>
@@ -4003,5 +4006,37 @@
   </data>
   <data name="ManageTags" xml:space="preserve">
     <value>Gestisci etichette</value>
+  </data>
+  <data name="Available" xml:space="preserve">
+    <value>Disponibile</value>
+  </data>
+  <data name="Total" xml:space="preserve">
+    <value>Totale</value>
+  </data>
+  <data name="AlwaysSwitchToNewlyOpenedTab" xml:space="preserve">
+    <value>Cambia sempre il focus alla nuova scheda creata</value>
+  </data>
+  <data name="ToggleShelfPane" xml:space="preserve">
+    <value>Attiva/disattiva il riquadro scaffale</value>
+  </data>
+  <data name="ToggleShelfPaneDescription" xml:space="preserve">
+    <value>Attiva/disattiva la visibilità del riquadro scaffale</value>
+  </data>
+  <data name="ShowShelfPaneButtonInAddressBar" xml:space="preserve">
+    <value>Mostra Attiva/disattiva riquadro scaffale nella barra degli indirizzi</value>
+  </data>
+  <data name="Shelf" xml:space="preserve">
+    <value>Scaffale</value>
+    <comment>'Shelf' refers to the Shelf Pane feature, where users can conveniently drag and drop files for quick access and perform bulk actions with ease.</comment>
+  </data>
+  <data name="ClearItems" xml:space="preserve">
+    <value>Cancella elementi</value>
+  </data>
+  <data name="RemoveFromShelf" xml:space="preserve">
+    <value>Rimuovi dallo scaffale</value>
+  </data>
+  <data name="AddToShelf" xml:space="preserve">
+    <value>Aggiungi allo scaffale</value>
+    <comment>Tooltip that displays when dragging items to the Shelf Pane</comment>
   </data>
 </root>

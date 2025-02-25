@@ -1,12 +1,12 @@
-﻿// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+﻿// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 using Microsoft.UI.Windowing;
 using Windows.Graphics;
 
 namespace Files.App.Actions
 {
-	internal sealed class EnterCompactOverlayAction : ObservableObject, IAction
+	internal sealed partial class EnterCompactOverlayAction : ObservableObject, IAction
 	{
 		private readonly IWindowContext windowContext;
 

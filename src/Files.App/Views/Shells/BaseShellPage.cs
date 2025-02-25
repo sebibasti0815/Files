@@ -1,5 +1,5 @@
-// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
@@ -180,12 +180,11 @@ namespace Files.App.Views.Shells
 				FlowDirection = FlowDirection.RightToLeft;
 
 			ToolbarViewModel.ToolbarPathItemInvoked += ShellPage_NavigationRequested;
-			ToolbarViewModel.ToolbarFlyoutOpened += ShellPage_ToolbarFlyoutOpened;
+			ToolbarViewModel.ToolbarFlyoutOpening += ShellPage_ToolbarFlyoutOpening;
 			ToolbarViewModel.ToolbarPathItemLoaded += ShellPage_ToolbarPathItemLoaded;
 			ToolbarViewModel.AddressBarTextEntered += ShellPage_AddressBarTextEntered;
 			ToolbarViewModel.PathBoxItemDropped += ShellPage_PathBoxItemDropped;
 
-			ToolbarViewModel.RefreshRequested += ShellPage_RefreshRequested;
 			ToolbarViewModel.EditModeEnabled += NavigationToolbar_EditModeEnabled;
 			ToolbarViewModel.ItemDraggedOverPathItem += ShellPage_NavigationRequested;
 			ToolbarViewModel.PathBoxQuerySubmitted += NavigationToolbar_QuerySubmitted;
@@ -379,11 +378,6 @@ namespace Files.App.Views.Shells
 			}
 		}
 
-		protected async void ShellPage_RefreshRequested(object sender, EventArgs e)
-		{
-			await Refresh_Click();
-		}
-
 		protected void AppSettings_SortDirectionPreferenceUpdated(object sender, SortDirection e)
 		{
 			ShellViewModel?.UpdateSortDirectionStatusAsync();
@@ -431,12 +425,12 @@ namespace Files.App.Views.Shells
 			await ToolbarViewModel.SetPathBoxDropDownFlyoutAsync(e.OpenedFlyout, e.Item, this);
 		}
 
-		protected async void ShellPage_ToolbarFlyoutOpened(object sender, ToolbarFlyoutOpenedEventArgs e)
+		protected async void ShellPage_ToolbarFlyoutOpening(object sender, ToolbarFlyoutOpeningEventArgs e)
 		{
-			var pathBoxItem = ((Button)e.OpenedFlyout.Target).DataContext as PathBoxItem;
+			var pathBoxItem = ((Button)e.OpeningFlyout.Target).DataContext as PathBoxItem;
 
 			if (pathBoxItem is not null)
-				await ToolbarViewModel.SetPathBoxDropDownFlyoutAsync(e.OpenedFlyout, pathBoxItem, this);
+				await ToolbarViewModel.SetPathBoxDropDownFlyoutAsync(e.OpeningFlyout, pathBoxItem, this);
 		}
 
 		protected async void NavigationToolbar_QuerySubmitted(object sender, ToolbarQuerySubmittedEventArgs e)
@@ -553,7 +547,6 @@ namespace Files.App.Views.Shells
 				{
 					Query = InstanceViewModel.CurrentSearchQuery ?? (string)TabBarItemParameter.NavigationParameter,
 					Folder = ShellViewModel.WorkingDirectory,
-					ThumbnailSize = InstanceViewModel.FolderSettings.GetRoundedIconSize(),
 				};
 
 				await ShellViewModel.SearchAsync(searchInstance);
@@ -562,6 +555,12 @@ namespace Files.App.Views.Shells
 			{
 				ToolbarViewModel.CanRefresh = false;
 				ShellViewModel?.RefreshItems(null);
+			}
+			else if (ItemDisplay.Content is HomePage homePage)
+			{
+				ToolbarViewModel.CanRefresh = false;
+				await homePage.ViewModel.RefreshWidgetProperties();
+				ToolbarViewModel.CanRefresh = true;
 			}
 		}
 
@@ -828,11 +827,10 @@ namespace Files.App.Views.Shells
 			drivesViewModel.PropertyChanged -= DrivesManager_PropertyChanged;
 
 			ToolbarViewModel.ToolbarPathItemInvoked -= ShellPage_NavigationRequested;
-			ToolbarViewModel.ToolbarFlyoutOpened -= ShellPage_ToolbarFlyoutOpened;
+			ToolbarViewModel.ToolbarFlyoutOpening -= ShellPage_ToolbarFlyoutOpening;
 			ToolbarViewModel.ToolbarPathItemLoaded -= ShellPage_ToolbarPathItemLoaded;
 			ToolbarViewModel.AddressBarTextEntered -= ShellPage_AddressBarTextEntered;
 			ToolbarViewModel.PathBoxItemDropped -= ShellPage_PathBoxItemDropped;
-			ToolbarViewModel.RefreshRequested -= ShellPage_RefreshRequested;
 			ToolbarViewModel.EditModeEnabled -= NavigationToolbar_EditModeEnabled;
 			ToolbarViewModel.ItemDraggedOverPathItem -= ShellPage_NavigationRequested;
 			ToolbarViewModel.PathBoxQuerySubmitted -= NavigationToolbar_QuerySubmitted;

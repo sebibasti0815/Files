@@ -1,9 +1,9 @@
-﻿// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+﻿// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 namespace Files.App.Actions
 {
-	internal sealed class SortByNameAction : SortByAction
+	internal sealed partial class SortByNameAction : SortByAction
 	{
 		protected override SortOption SortOption
 			=> SortOption.Name;
@@ -15,7 +15,7 @@ namespace Files.App.Actions
 			=> "SortByNameDescription".GetLocalizedResource();
 	}
 
-	internal sealed class SortByDateModifiedAction : SortByAction
+	internal sealed partial class SortByDateModifiedAction : SortByAction
 	{
 		protected override SortOption SortOption
 			=> SortOption.DateModified;
@@ -27,7 +27,7 @@ namespace Files.App.Actions
 			=> "SortByDateModifiedDescription".GetLocalizedResource();
 	}
 
-	internal sealed class SortByDateCreatedAction : SortByAction
+	internal sealed partial class SortByDateCreatedAction : SortByAction
 	{
 		protected override SortOption SortOption
 			=> SortOption.DateCreated;
@@ -39,7 +39,7 @@ namespace Files.App.Actions
 			=> "SortByDateCreatedDescription".GetLocalizedResource();
 	}
 
-	internal sealed class SortBySizeAction : SortByAction
+	internal sealed partial class SortBySizeAction : SortByAction
 	{
 		protected override SortOption SortOption
 			=> SortOption.Size;
@@ -51,7 +51,7 @@ namespace Files.App.Actions
 			=> "SortBySizeDescription".GetLocalizedResource();
 	}
 
-	internal sealed class SortByTypeAction : SortByAction
+	internal sealed partial class SortByTypeAction : SortByAction
 	{
 		protected override SortOption SortOption
 			=> SortOption.FileType;
@@ -63,7 +63,7 @@ namespace Files.App.Actions
 			=> "SortByTypeDescription".GetLocalizedResource();
 	}
 
-	internal sealed class SortBySyncStatusAction : SortByAction
+	internal sealed partial class SortBySyncStatusAction : SortByAction
 	{
 		protected override SortOption SortOption
 			=> SortOption.SyncStatus;
@@ -78,7 +78,7 @@ namespace Files.App.Actions
 			=> pageType is ContentPageTypes.CloudDrive;
 	}
 
-	internal sealed class SortByTagAction : SortByAction
+	internal sealed partial class SortByTagAction : SortByAction
 	{
 		protected override SortOption SortOption
 			=> SortOption.FileTag;
@@ -90,7 +90,7 @@ namespace Files.App.Actions
 			=> "SortByTagDescription".GetLocalizedResource();
 	}
 
-	internal sealed class SortByPathAction : SortByAction
+	internal sealed partial class SortByPathAction : SortByAction
 	{
 		protected override SortOption SortOption
 			=> SortOption.Path;
@@ -105,7 +105,7 @@ namespace Files.App.Actions
 			=> pageType is ContentPageTypes.SearchResults;
 	}
 
-	internal sealed class SortByOriginalFolderAction : SortByAction
+	internal sealed partial class SortByOriginalFolderAction : SortByAction
 	{
 		protected override SortOption SortOption
 			=> SortOption.OriginalFolder;
@@ -120,7 +120,7 @@ namespace Files.App.Actions
 			=> pageType is ContentPageTypes.RecycleBin;
 	}
 
-	internal sealed class SortByDateDeletedAction : SortByAction
+	internal sealed partial class SortByDateDeletedAction : SortByAction
 	{
 		protected override SortOption SortOption
 			=> SortOption.DateDeleted;
@@ -165,6 +165,7 @@ namespace Files.App.Actions
 		public Task ExecuteAsync(object? parameter = null)
 		{
 			displayContext.SortOption = SortOption;
+			LayoutHelpers.UpdateOpenTabsPreferences();
 
 			return Task.CompletedTask;
 		}
@@ -184,7 +185,7 @@ namespace Files.App.Actions
 		}
 	}
 
-	internal sealed class SortAscendingAction : ObservableObject, IToggleAction
+	internal sealed partial class SortAscendingAction : ObservableObject, IToggleAction
 	{
 		private readonly IDisplayPageContext context;
 
@@ -207,6 +208,7 @@ namespace Files.App.Actions
 		public Task ExecuteAsync(object? parameter = null)
 		{
 			context.SortDirection = SortDirection.Ascending;
+			LayoutHelpers.UpdateOpenTabsPreferences();
 
 			return Task.CompletedTask;
 		}
@@ -218,7 +220,7 @@ namespace Files.App.Actions
 		}
 	}
 
-	internal sealed class SortDescendingAction : ObservableObject, IToggleAction
+	internal sealed partial class SortDescendingAction : ObservableObject, IToggleAction
 	{
 		private readonly IDisplayPageContext context;
 
@@ -241,6 +243,7 @@ namespace Files.App.Actions
 		public Task ExecuteAsync(object? parameter = null)
 		{
 			context.SortDirection = SortDirection.Descending;
+			LayoutHelpers.UpdateOpenTabsPreferences();
 
 			return Task.CompletedTask;
 		}
@@ -273,6 +276,8 @@ namespace Files.App.Actions
 				context.SortDirection is SortDirection.Descending
 					? SortDirection.Ascending
 					: SortDirection.Descending;
+
+			LayoutHelpers.UpdateOpenTabsPreferences();
 
 			return Task.CompletedTask;
 		}

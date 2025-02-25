@@ -1,9 +1,9 @@
-﻿// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+﻿// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 namespace Files.App.ViewModels.Dialogs
 {
-	public sealed class ReleaseNotesDialogViewModel : ObservableObject
+	public sealed partial class ReleaseNotesDialogViewModel : ObservableObject
 	{
 		private string _BlogPostUrl = string.Empty;
 		public string BlogPostUrl

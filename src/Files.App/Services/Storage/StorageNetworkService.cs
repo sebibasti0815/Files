@@ -1,5 +1,5 @@
-// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 using System.Runtime.InteropServices;
 using System.Text;
@@ -12,7 +12,7 @@ using Windows.Win32.Security.Credentials;
 
 namespace Files.App.Services
 {
-	public sealed class NetworkService : ObservableObject, INetworkService
+	public sealed partial class NetworkService : ObservableObject, INetworkService
 	{
 		private ICommonDialogService CommonDialogService { get; } = Ioc.Default.GetRequiredService<ICommonDialogService>();
 

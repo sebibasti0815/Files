@@ -1,11 +1,11 @@
-// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 using Microsoft.UI.Xaml.Controls;
 
 namespace Files.App.Data.Items
 {
-	public sealed class WslDistroItem : ObservableObject, INavigationControlItem
+	public sealed partial class WslDistroItem : ObservableObject, INavigationControlItem
 	{
 		public string Text { get; set; }
 

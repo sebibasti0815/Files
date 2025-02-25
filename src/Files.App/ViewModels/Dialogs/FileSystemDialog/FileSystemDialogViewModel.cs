@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+﻿// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 using Files.App.Data.Enums;
 using Files.Shared.Extensions;
@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Files.App.ViewModels.Dialogs.FileSystemDialog
 {
-	public sealed class FileSystemDialogViewModel : BaseDialogViewModel, IRecipient<FileSystemDialogOptionChangedMessage>
+	public sealed partial class FileSystemDialogViewModel : BaseDialogViewModel, IRecipient<FileSystemDialogOptionChangedMessage>
 	{
 		private readonly IUserSettingsService _userSettingsService;
 

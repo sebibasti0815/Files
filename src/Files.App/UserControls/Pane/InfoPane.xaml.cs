@@ -1,5 +1,5 @@
-// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -76,7 +76,7 @@ namespace Files.App.UserControls
 			VisualStateManager.GoToState((UserControl)sender, "Normal", true);
 		}
 
-		private sealed class ObservableContext : ObservableObject
+		private sealed partial class ObservableContext : ObservableObject
 		{
 			private bool isHorizontal = false;
 			public bool IsHorizontal

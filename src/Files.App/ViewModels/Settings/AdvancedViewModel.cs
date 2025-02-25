@@ -1,5 +1,5 @@
-// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
@@ -15,7 +15,7 @@ using Windows.Win32.Storage.FileSystem;
 
 namespace Files.App.ViewModels.Settings
 {
-	public sealed class AdvancedViewModel : ObservableObject
+	public sealed partial class AdvancedViewModel : ObservableObject
 	{
 		private IUserSettingsService UserSettingsService { get; } = Ioc.Default.GetRequiredService<IUserSettingsService>();
 		private ICommonDialogService CommonDialogService { get; } = Ioc.Default.GetRequiredService<ICommonDialogService>();
@@ -292,7 +292,7 @@ namespace Files.App.ViewModels.Settings
 			set => SetProperty(ref isSetAsOpenFileDialog, value);
 		}
 
-		public bool CanShowSetAsOpenFileDialog
+		public bool IsAppEnvironmentDev
 		{
 			get => AppLifecycleHelper.AppEnvironment is AppEnvironment.Dev;
 		}

@@ -1,5 +1,5 @@
-// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 using Files.App.Actions;
 using Microsoft.Extensions.Logging;
@@ -8,7 +8,7 @@ using System.Collections.Immutable;
 
 namespace Files.App.Data.Commands
 {
-	internal sealed class CommandManager : ICommandManager
+	internal sealed partial class CommandManager : ICommandManager
 	{
 		// Dependency injections
 
@@ -57,6 +57,7 @@ namespace Files.App.Data.Commands
 		public IRichCommand ToggleDetailsPane => commands[CommandCodes.ToggleDetailsPane];
 		public IRichCommand ToggleInfoPane => commands[CommandCodes.ToggleInfoPane];
 		public IRichCommand ToggleToolbar => commands[CommandCodes.ToggleToolbar];
+		public IRichCommand ToggleShelfPane => commands[CommandCodes.ToggleShelfPane];
 		public IRichCommand SelectAll => commands[CommandCodes.SelectAll];
 		public IRichCommand InvertSelection => commands[CommandCodes.InvertSelection];
 		public IRichCommand ClearSelection => commands[CommandCodes.ClearSelection];
@@ -131,7 +132,7 @@ namespace Files.App.Data.Commands
 		public IRichCommand LayoutIncreaseSize => commands[CommandCodes.LayoutIncreaseSize];
 		public IRichCommand LayoutDetails => commands[CommandCodes.LayoutDetails];
 		public IRichCommand LayoutList => commands[CommandCodes.LayoutList];
-		public IRichCommand LayoutTiles => commands[CommandCodes.LayoutTiles];
+		public IRichCommand LayoutCards=> commands[CommandCodes.LayoutCards];
 		public IRichCommand LayoutGrid => commands[CommandCodes.LayoutGrid];
 		public IRichCommand LayoutColumns => commands[CommandCodes.LayoutColumns];
 		public IRichCommand LayoutAdaptive => commands[CommandCodes.LayoutAdaptive];
@@ -260,6 +261,7 @@ namespace Files.App.Data.Commands
 			[CommandCodes.ToggleDetailsPane] = new ToggleDetailsPaneAction(),
 			[CommandCodes.ToggleInfoPane] = new ToggleInfoPaneAction(),
 			[CommandCodes.ToggleToolbar] = new ToggleToolbarAction(),
+			[CommandCodes.ToggleShelfPane] = new ToggleShelfPaneAction(),
 			[CommandCodes.SelectAll] = new SelectAllAction(),
 			[CommandCodes.InvertSelection] = new InvertSelectionAction(),
 			[CommandCodes.ClearSelection] = new ClearSelectionAction(),
@@ -334,7 +336,7 @@ namespace Files.App.Data.Commands
 			[CommandCodes.LayoutIncreaseSize] = new LayoutIncreaseSizeAction(),
 			[CommandCodes.LayoutDetails] = new LayoutDetailsAction(),
 			[CommandCodes.LayoutList] = new LayoutListAction(),
-			[CommandCodes.LayoutTiles] = new LayoutTilesAction(),
+			[CommandCodes.LayoutCards] = new LayoutCardsAction(),
 			[CommandCodes.LayoutGrid] = new LayoutGridAction(),
 			[CommandCodes.LayoutColumns] = new LayoutColumnsAction(),
 			[CommandCodes.LayoutAdaptive] = new LayoutAdaptiveAction(),

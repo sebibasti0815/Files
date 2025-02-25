@@ -1,5 +1,5 @@
-// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 using System.IO;
 using System.Windows.Input;
@@ -7,7 +7,7 @@ using Windows.Storage;
 
 namespace Files.App.ViewModels.Dialogs
 {
-	public sealed class DecompressArchiveDialogViewModel : ObservableObject
+	public sealed partial class DecompressArchiveDialogViewModel : ObservableObject
 	{
 		private ICommonDialogService CommonDialogService { get; } = Ioc.Default.GetRequiredService<ICommonDialogService>();
 

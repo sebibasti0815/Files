@@ -1,9 +1,9 @@
-﻿// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+﻿// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 namespace Files.App.Actions
 {
-	internal sealed class NavigateForwardAction : ObservableObject, IAction
+	internal sealed partial class NavigateForwardAction : ObservableObject, IAction
 	{
 		private readonly IContentPageContext context;
 

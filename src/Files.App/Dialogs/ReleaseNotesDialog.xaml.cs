@@ -1,5 +1,5 @@
-// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -53,6 +53,7 @@ namespace Files.App.Dialogs
 
 		private void CloseDialogButton_Click(object sender, RoutedEventArgs e)
 		{
+			BlogPostWebView.Close();
 			Hide();
 		}
 
@@ -97,7 +98,7 @@ namespace Files.App.Dialogs
 
 			// Navigate back to blog post
 			if (sender.CoreWebView2.CanGoBack)
-				sender.CoreWebView2.GoBack(); 
+				sender.CoreWebView2.GoBack();
 		}
 
 	}

@@ -1,12 +1,12 @@
-﻿// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+﻿// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 namespace Files.App.Actions
 {
-	internal sealed class NextTabAction : ObservableObject, IAction
+	internal sealed partial class NextTabAction : ObservableObject, IAction
 	{
 		private readonly IMultitaskingContext multitaskingContext;
 

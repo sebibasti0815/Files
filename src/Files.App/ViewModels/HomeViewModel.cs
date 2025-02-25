@@ -1,12 +1,12 @@
-// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 using Microsoft.UI.Xaml;
 using System.Windows.Input;
 
 namespace Files.App.ViewModels
 {
-	public sealed class HomeViewModel : ObservableObject, IDisposable
+	public sealed partial class HomeViewModel : ObservableObject, IDisposable
 	{
 		// Dependency injections
 
@@ -113,6 +113,11 @@ namespace Files.App.ViewModels
 			}
 
 			ReloadWidgets();
+		}
+
+		public Task RefreshWidgetProperties()
+		{
+			return Task.WhenAll(WidgetItems.Select(w => w.WidgetItemModel.RefreshWidgetAsync()));
 		}
 
 		private bool InsertWidget(WidgetContainerItem widgetModel, int atIndex)

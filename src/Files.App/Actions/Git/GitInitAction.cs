@@ -1,9 +1,9 @@
-﻿// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+﻿// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 namespace Files.App.Actions
 {
-    sealed class GitInitAction : ObservableObject, IAction
+    sealed partial class GitInitAction : ObservableObject, IAction
     {
 		private readonly IContentPageContext _context;
 

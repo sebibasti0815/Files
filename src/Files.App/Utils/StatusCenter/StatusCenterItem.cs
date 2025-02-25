@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+﻿// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 using System.Windows.Input;
 using Microsoft.UI.Xaml.Media;
@@ -12,7 +12,7 @@ namespace Files.App.Utils.StatusCenter
 	/// <br/>
 	/// Handles all operation's functionality and UI.
 	/// </summary>
-	public sealed class StatusCenterItem : ObservableObject
+	public sealed partial class StatusCenterItem : ObservableObject
 	{
 		private readonly StatusCenterViewModel _viewModel = Ioc.Default.GetRequiredService<StatusCenterViewModel>();
 

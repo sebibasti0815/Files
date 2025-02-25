@@ -1,12 +1,12 @@
-﻿// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+﻿// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 using System.Text;
 using Windows.Storage;
 
 namespace Files.App.Actions
 {
-	internal class OpenTerminalAction : ObservableObject, IAction
+	internal partial class OpenTerminalAction : ObservableObject, IAction
 	{
 		private readonly IContentPageContext context;
 

@@ -1,9 +1,9 @@
-﻿// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+﻿// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 namespace Files.App.Actions
 {
-	internal sealed class CompressIntoSevenZipAction : BaseCompressArchiveAction
+	internal sealed partial class CompressIntoSevenZipAction : BaseCompressArchiveAction
 	{
 		public override string Label
 			=> string.Format("CreateNamedArchive".GetLocalizedResource(), $"{StorageArchiveService.GenerateArchiveNameFromItems(context.SelectedItems)}.7z");

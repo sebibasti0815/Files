@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2024 Files Community
-// Licensed under the MIT License. See the LICENSE.
+﻿// Copyright (c) Files Community
+// Licensed under the MIT License.
 
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml.Controls;
@@ -15,7 +15,7 @@ namespace Files.App.ViewModels.UserControls.Widgets
 	/// <summary>
 	/// Represents view model of <see cref="QuickAccessWidget"/>.
 	/// </summary>
-	public sealed class QuickAccessWidgetViewModel : BaseWidgetViewModel, IWidgetViewModel
+	public sealed partial class QuickAccessWidgetViewModel : BaseWidgetViewModel, IWidgetViewModel
 	{
 		// Properties
 
