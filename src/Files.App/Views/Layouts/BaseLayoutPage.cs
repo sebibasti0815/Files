@@ -441,6 +441,8 @@ namespace Files.App.Views.Layouts
 				ParentShellPageInstance.InstanceViewModel.IsPageTypeZipFolder = ZipStorageFolder.IsZipPath(workingDir);
 				ParentShellPageInstance.InstanceViewModel.IsPageTypeLibrary = LibraryManager.IsLibraryPath(workingDir);
 				ParentShellPageInstance.InstanceViewModel.IsPageTypeSearchResults = false;
+				ParentShellPageInstance.InstanceViewModel.IsPageTypeReleaseNotes = false;
+				ParentShellPageInstance.InstanceViewModel.IsPageTypeSettings = false;
 				ParentShellPageInstance.ToolbarViewModel.PathControlDisplayText = navigationArguments.NavPathParam;
 
 				if (ParentShellPageInstance.InstanceViewModel.FolderSettings.DirectorySortOption == SortOption.Path)
@@ -474,6 +476,8 @@ namespace Files.App.Views.Layouts
 				ParentShellPageInstance.InstanceViewModel.IsPageTypeZipFolder = ZipStorageFolder.IsZipPath(workingDir);
 				ParentShellPageInstance.InstanceViewModel.IsPageTypeLibrary = LibraryManager.IsLibraryPath(workingDir);
 				ParentShellPageInstance.InstanceViewModel.IsPageTypeSearchResults = true;
+				ParentShellPageInstance.InstanceViewModel.IsPageTypeReleaseNotes = false;
+				ParentShellPageInstance.InstanceViewModel.IsPageTypeSettings = false;
 
 				if (!navigationArguments.IsLayoutSwitch)
 				{
@@ -936,7 +940,7 @@ namespace Files.App.Views.Layouts
 
 			// Filter mainShellMenuItems that have a non-null LoadSubMenuAction
 			var mainItemsWithSubMenu = mainShellMenuItems.Where(x => x.LoadSubMenuAction is not null);
-			
+
 			var mainSubMenuTasks = mainItemsWithSubMenu.Select(async item =>
 			{
 				await item.LoadSubMenuAction();
@@ -951,7 +955,7 @@ namespace Files.App.Views.Layouts
 				await item.LoadSubMenuAction();
 				ShellContextFlyoutFactory.AddItemsToOverflowMenu(overflowItem, item);
 			});
-			
+
 			itemsControl?.Items.OfType<FrameworkElement>().ForEach(item =>
 			{
 				// Enable CharacterEllipsis text trimming for menu items
@@ -977,7 +981,7 @@ namespace Files.App.Views.Layouts
 					clickAction(flyout.Items);
 				}
 			});
-			
+
 			await Task.WhenAll(mainSubMenuTasks.Concat(overflowSubMenuTasks));
 		}
 
@@ -1158,15 +1162,24 @@ namespace Files.App.Views.Layouts
 		protected virtual async void Item_Drop(object sender, DragEventArgs e)
 		{
 			var deferral = e.GetDeferral();
-
 			e.Handled = true;
+
+			try
+			{
+				_ = e.Data.Properties;
+				var exists = e.Data.Properties.TryGetValue("Files_ActionBinder", out var val);
+				_ = val;
+			}
+			catch (NullReferenceException)
+			{
+				// e.Data or e.Data.Properties is null, continue without the property check
+			}
 
 			// Reset dragged over item
 			dragOverItem = null;
-
 			var item = GetItemFromElement(sender);
 			if (item is not null)
-				await ParentShellPageInstance!.FilesystemHelpers.PerformOperationTypeAsync(e.AcceptedOperation, e.DataView, (item as ShortcutItem)?.TargetPath ?? item.ItemPath, false, true, item.IsExecutable, item.IsScriptFile);
+				await ParentShellPageInstance!.FilesystemHelpers.PerformOperationTypeAsync(e.AcceptedOperation, e.DataView, (item as IShortcutItem)?.TargetPath ?? item.ItemPath, false, true, item.IsExecutable, item.IsScriptFile);
 
 			deferral.Complete();
 		}
@@ -1226,6 +1239,9 @@ namespace Files.App.Views.Layouts
 						await ParentShellPageInstance!.ShellViewModel.LoadExtendedItemPropertiesAsync(listedItem);
 						if (ParentShellPageInstance.ShellViewModel.EnabledGitProperties is not GitProperties.None && listedItem is IGitItem gitItem)
 							await ParentShellPageInstance.ShellViewModel.LoadGitPropertiesAsync(gitItem);
+
+						// Focus file list when items finish loading (#16530)
+						ItemManipulationModel.FocusFileList();
 					});
 				}
 			}

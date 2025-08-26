@@ -42,7 +42,7 @@ namespace Files.App.Controls
 		{
 			DefaultStyleKey = typeof(BreadcrumbBar);
 
-			_itemsRepeaterLayout = new(this, 2d);
+			_itemsRepeaterLayout = new(this);
 		}
 
 		// Methods
@@ -63,6 +63,7 @@ namespace Files.App.Controls
 			_itemsRepeater.Layout = _itemsRepeaterLayout;
 
 			_itemsRepeater.ElementPrepared += ItemsRepeater_ElementPrepared;
+			_itemsRepeater.ElementClearing += ItemsRepeater_ElementClearing;
 			_itemsRepeater.ItemsSourceView.CollectionChanged += ItemsSourceView_CollectionChanged;
 		}
 
@@ -87,12 +88,13 @@ namespace Files.App.Controls
 
 		internal protected virtual void OnLayoutUpdated()
 		{
-			if (_itemsRepeater is null)
+			if (_itemsRepeater is null || (_itemsRepeaterLayout.IndexAfterEllipsis > _itemsRepeaterLayout.VisibleItemsCount && _isEllipsisRendered))
 				return;
 
+			if (_ellipsisBreadcrumbBarItem is not null && _isEllipsisRendered != _itemsRepeaterLayout.EllipsisIsRendered)
+				_ellipsisBreadcrumbBarItem.Visibility = _itemsRepeaterLayout.EllipsisIsRendered ? Visibility.Visible : Visibility.Collapsed;
+
 			_isEllipsisRendered = _itemsRepeaterLayout.EllipsisIsRendered;
-			if (_ellipsisBreadcrumbBarItem is not null)
-				_ellipsisBreadcrumbBarItem.Visibility = _isEllipsisRendered ? Visibility.Visible : Visibility.Collapsed;
 
 			for (int accessibilityIndex = 0, collectionIndex = _itemsRepeaterLayout.IndexAfterEllipsis;
 				accessibilityIndex < _itemsRepeaterLayout.VisibleItemsCount;
@@ -125,6 +127,9 @@ namespace Files.App.Controls
 			if (args.Element is not BreadcrumbBarItem item || _itemsRepeater is null)
 				return;
 
+			item.IsLastItem = false;
+			item.IsEllipsis = false;
+
 			if (args.Index == _itemsRepeater.ItemsSourceView.Count - 1)
 			{
 				_lastBreadcrumbBarItem = item;
@@ -145,6 +150,15 @@ namespace Files.App.Controls
 			{
 				_lastBreadcrumbBarItem = item;
 				item.IsLastItem = true;
+			}
+		}
+
+		private void ItemsRepeater_ElementClearing(ItemsRepeater sender, ItemsRepeaterElementClearingEventArgs args)
+		{
+			if (args.Element is BreadcrumbBarItem item)
+			{
+				item.IsLastItem = false;
+				item.IsEllipsis = false;
 			}
 		}
 	}

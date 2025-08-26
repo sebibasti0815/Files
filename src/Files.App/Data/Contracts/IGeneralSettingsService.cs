@@ -51,6 +51,11 @@ namespace Files.App.Data.Contracts
 		List<string> PathHistoryList { get; set; }
 
 		/// <summary>
+		/// A list containing previous search queries.
+		/// </summary>
+		List<string> PreviousSearchQueriesList { get; set; }
+
+		/// <summary>
 		/// Gets or sets a value indicating which date and time format to use.
 		/// </summary>
 		DateTimeFormats DateTimeFormat { get; set; }
@@ -211,6 +216,11 @@ namespace Files.App.Data.Contracts
 		bool ShowOpenInNewPane { get; set; }
 
 		/// <summary>
+		/// Gets or sets a value indicating whether or not to show the option to open folders in Windows Terminal.
+		/// </summary>
+		bool ShowOpenTerminal { get; set; }
+
+		/// <summary>
 		/// Gets or sets a value indicating whether or not to show the option to copy an items path.
 		/// </summary>
 		bool ShowCopyPath { get; set; }
@@ -294,5 +304,10 @@ namespace Files.App.Data.Contracts
 		/// Gets or sets a value indicating whether or not to show the shelf pane.
 		/// </summary>
 		bool ShowShelfPane { get; set; }
+
+		/// <summary>
+		/// Gets or sets a value whether the filter header should be displayed.
+		/// </summary>
+		bool ShowFilterHeader { get; set; }
 	}
 }

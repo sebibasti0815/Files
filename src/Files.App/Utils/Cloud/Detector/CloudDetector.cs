@@ -1,8 +1,6 @@
 // Copyright (c) Files Community
 // Licensed under the MIT License.
 
-using Files.App.Utils.Cloud;
-
 namespace Files.App.Utils.Cloud
 {
 	/// <summary>
@@ -33,7 +31,7 @@ namespace Files.App.Utils.Cloud
 			yield return new BoxCloudDetector();
 			yield return new GenericCloudDetector();
 			yield return new SynologyDriveCloudDetector();
-			yield return new LucidLinkCloudDetector();
+			yield return new OXDriveCloudDetector();
 		}
 	}
 }

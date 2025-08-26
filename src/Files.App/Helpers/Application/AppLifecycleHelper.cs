@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Files Community
 // Licensed under the MIT License.
 
-using CommunityToolkit.WinUI;
 using Files.App.Helpers.Application;
 using Files.App.Services.SizeProvider;
 using Files.App.Utils.Logger;
@@ -13,7 +12,6 @@ using Microsoft.Win32;
 using Sentry;
 using Sentry.Protocol;
 using System.IO;
-using System.Security;
 using System.Text;
 using Windows.ApplicationModel;
 using Windows.Storage;
@@ -44,6 +42,11 @@ namespace Files.App.Helpers
 		/// </summary>
 		public static long TotalLaunchCount { get; }
 
+		/// <summary>
+		/// Gets the value that indicates if the release notes tab was automatically opened.
+		/// </summary>
+		private static bool ViewedReleaseNotes { get; set; } = false;
+
 		static AppLifecycleHelper()
 		{
 			using var infoKey = Registry.CurrentUser.CreateSubKey(AppInformationKey);
@@ -56,10 +59,11 @@ namespace Files.App.Helpers
 			}
 			else
 			{
-				IsAppUpdated = version.ToString() != Package.Current.Id.Version.ToString();
+				IsAppUpdated = version.ToString() != AppVersion.ToString();
 			}
-			TotalLaunchCount = launchCount is long l ? l + 1 : 1;
-			infoKey.SetValue("LastLaunchVersion", Package.Current.Id.Version.ToString()!);
+
+			TotalLaunchCount = long.TryParse(launchCount?.ToString(), out var v) ? v + 1 : 1;
+			infoKey.SetValue("LastLaunchVersion", AppVersion.ToString());
 			infoKey.SetValue("TotalLaunchCount", TotalLaunchCount);
 		}
 
@@ -136,10 +140,21 @@ namespace Files.App.Helpers
 		{
 			var updateService = Ioc.Default.GetRequiredService<IUpdateService>();
 
+			await updateService.CheckForReleaseNotesAsync();
+
+			// Check for release notes before checking for new updates
+			if (AppEnvironment != AppEnvironment.Dev &&
+				IsAppUpdated &&
+				updateService.AreReleaseNotesAvailable &&
+				!ViewedReleaseNotes)
+			{
+				await Ioc.Default.GetRequiredService<ICommandManager>().OpenReleaseNotes.ExecuteAsync();
+				ViewedReleaseNotes = true;
+			}
+
 			await updateService.CheckForUpdatesAsync();
 			await updateService.DownloadMandatoryUpdatesAsync();
 			await updateService.CheckAndUpdateFilesLauncherAsync();
-			await updateService.CheckForReleaseNotesAsync();
 		}
 
 		/// <summary>
@@ -236,6 +251,7 @@ namespace Files.App.Helpers
 					.AddSingleton<InfoPaneViewModel>()
 					.AddSingleton<SidebarViewModel>()
 					.AddSingleton<DrivesViewModel>()
+					.AddSingleton<ShelfViewModel>()
 					.AddSingleton<StatusCenterViewModel>()
 					.AddSingleton<AppearanceViewModel>()
 					.AddTransient<HomeViewModel>()
@@ -244,6 +260,7 @@ namespace Files.App.Helpers
 					.AddSingleton<NetworkLocationsWidgetViewModel>()
 					.AddSingleton<FileTagsWidgetViewModel>()
 					.AddSingleton<RecentFilesWidgetViewModel>()
+					.AddSingleton<ReleaseNotesViewModel>()
 					// Utilities
 					.AddSingleton<QuickAccessManager>()
 					.AddSingleton<StorageHistoryWrapper>()

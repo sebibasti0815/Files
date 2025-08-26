@@ -2,6 +2,9 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections.Frozen;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Files.Shared.Helpers
@@ -11,6 +14,18 @@ namespace Files.Shared.Helpers
 	/// </summary>
 	public static class FileExtensionHelpers
 	{
+		private static readonly FrozenSet<string> _signableTypes = new HashSet<string>()
+		{
+			".aab", ".apk", ".application", ".appx", ".appxbundle", ".arx", ".cab", ".cat", ".cbx",
+			".cpl", ".crx", ".dbx", ".deploy", ".dll", ".doc", ".docm", ".dot", ".dotm", ".drx",
+			".ear", ".efi", ".exe", ".jar", ".js", ".manifest", ".mpp", ".mpt", ".msi", ".msix",
+			".msixbundle", ".msm", ".msp", ".nupkg", ".ocx", ".pot", ".potm", ".ppa", ".ppam", ".pps",
+			".ppsm", ".ppt", ".pptm", ".ps1", ".psm1", ".psi", ".pub", ".sar", ".stl", ".sys", ".vbs",
+			".vdw", ".vdx", ".vsd", ".vsdm", ".vss", ".vssm", ".vst", ".vstm", ".vsto", ".vsix", ".vsx", ".vtx",
+			".vxd", ".war", ".wiz", ".wsf", ".xap", ".xla", ".xlam", ".xls", ".xlsb", ".xlsm", ".xlt",
+			".xltm", ".xlsm", ".xsn"
+		}.ToFrozenSet();
+
 		/// <summary>
 		/// Check if the file extension matches one of the specified extensions.
 		/// </summary>
@@ -22,7 +37,12 @@ namespace Files.Shared.Helpers
 			if (string.IsNullOrWhiteSpace(filePathToCheck))
 				return false;
 
-			return extensions.Any(ext => filePathToCheck.EndsWith(ext, StringComparison.OrdinalIgnoreCase));
+			// Don't check folder paths to avoid issues
+			// https://github.com/files-community/Files/issues/17094
+			if (Directory.Exists(filePathToCheck))
+				return false;
+
+			return extensions.Any(ext => Path.GetExtension(filePathToCheck).Equals(ext, StringComparison.OrdinalIgnoreCase));
 		}
 
 		/// <summary>
@@ -54,7 +74,7 @@ namespace Files.Shared.Helpers
 		{
 			return HasExtension(fileExtensionToCheck, ".mp3", ".m4a", ".wav", ".wma", ".aac", ".adt", ".adts", ".cda", ".flac");
 		}
-		
+
 		/// <summary>
 		/// Check if the file extension is a video file.
 		/// </summary>
@@ -213,7 +233,7 @@ namespace Files.Shared.Helpers
 		{
 			return HasExtension(fileExtensionToCheck, ".vhd", ".vhdx");
 		}
-		
+
 		/// <summary>
 		/// Check if the file extension is a screen saver file.
 		/// </summary>
@@ -256,7 +276,7 @@ namespace Files.Shared.Helpers
 		{
 			return HasExtension(filePathToCheck, ".py", ".ahk");
 		}
-		
+
 		/// <summary>
 		/// Check if the file extension is a system file.
 		/// </summary>
@@ -267,5 +287,20 @@ namespace Files.Shared.Helpers
 			return HasExtension(filePathToCheck, ".dll", ".exe", ".sys", ".inf");
 		}
 
+		/// <summary>
+		/// Check if the file is signable.
+		/// </summary>
+		/// <param name="filePathToCheck"></param>
+		/// <returns><c>true</c> if the filePathToCheck is a signable file; otherwise, <c>false</c>.</returns>
+		public static bool IsSignableFile(string? filePathToCheck, bool isExtension = false)
+		{
+			if (string.IsNullOrWhiteSpace(filePathToCheck))
+				return false;
+
+			if (!isExtension)
+				filePathToCheck = Path.GetExtension(filePathToCheck);
+
+			return _signableTypes.Contains(filePathToCheck);
+		}
 	}
 }

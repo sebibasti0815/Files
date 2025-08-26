@@ -13,7 +13,6 @@ namespace Files.App.Controls
 		// Fields
 
 		private readonly WeakReference<BreadcrumbBar>? _ownerRef;
-		private readonly double _spacing = 0d;
 
 		private Size _availableSize;
 		private BreadcrumbBarItem? _ellipsisButton = null;
@@ -24,10 +23,9 @@ namespace Files.App.Controls
 		public int IndexAfterEllipsis { get; private set; }
 		public int VisibleItemsCount { get; private set; }
 
-		public BreadcrumbBarLayout(BreadcrumbBar breadcrumb, double spacing)
+		public BreadcrumbBarLayout(BreadcrumbBar breadcrumb)
 		{
 			_ownerRef = new(breadcrumb);
-			_spacing = spacing;
 		}
 
 		protected override Size MeasureOverride(NonVirtualizingLayoutContext context, Size availableSize)
@@ -35,13 +33,15 @@ namespace Files.App.Controls
 			var accumulatedSize = new Size(0, 0);
 			_availableSize = availableSize;
 
+			var indexAfterEllipsis = GetFirstIndexToRender(context);
+
 			// Go through all items and measure them
-			foreach (var item in context.Children)
+			for (int index = 0; index < context.Children.Count; index++)
 			{
-				if (item is BreadcrumbBarItem breadcrumbItem)
+				if (context.Children[index] is BreadcrumbBarItem breadcrumbItem)
 				{
 					breadcrumbItem.Measure(availableSize);
-					accumulatedSize.Width += breadcrumbItem.DesiredSize.Width;
+					accumulatedSize.Width += index < indexAfterEllipsis ? 0 : breadcrumbItem.DesiredSize.Width;
 					accumulatedSize.Height = Math.Max(accumulatedSize.Height, breadcrumbItem.DesiredSize.Height);
 				}
 			}
@@ -51,7 +51,7 @@ namespace Files.App.Controls
 				_ellipsisButton ??= context.Children[0] as BreadcrumbBarItem;
 
 			// Sets the ellipsis item's visibility based on whether the items are overflowing
-			EllipsisIsRendered = accumulatedSize.Width > availableSize.Width;
+			EllipsisIsRendered = indexAfterEllipsis is not 0;
 
 			return accumulatedSize;
 		}
@@ -79,7 +79,6 @@ namespace Files.App.Controls
 						breadcrumbItem.Arrange(new Rect(accumulatedWidths, 0, breadcrumbItem.DesiredSize.Width, breadcrumbItem.DesiredSize.Height));
 
 						accumulatedWidths += breadcrumbItem.DesiredSize.Width;
-						accumulatedWidths += _spacing;
 
 						VisibleItemsCount++;
 					}
@@ -89,15 +88,21 @@ namespace Files.App.Controls
 			if (_ownerRef?.TryGetTarget(out var breadcrumbBar) ?? false)
 				breadcrumbBar.OnLayoutUpdated();
 
+			finalSize.Width = accumulatedWidths;
+
 			return finalSize;
 		}
 
 		private int GetFirstIndexToRender(NonVirtualizingLayoutContext context)
 		{
 			var itemCount = context.Children.Count;
-			var accumulatedWidth = _spacing;
+			var accumulatedWidth = 0d;
 
-			// Go through all items from the end
+			// Handle zero or negative available width - hide all items
+			if (_availableSize.Width <= 0)
+				return itemCount;
+
+			// Go through all items from the last item
 			for (int index = itemCount - 1; index >= 0; index--)
 			{
 				var newAccumulatedWidth = accumulatedWidth + context.Children[index].DesiredSize.Width;

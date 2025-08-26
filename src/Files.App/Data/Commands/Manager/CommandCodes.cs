@@ -27,6 +27,8 @@ namespace Files.App.Data.Commands
 		ToggleInfoPane,
 		ToggleToolbar,
 		ToggleShelfPane,
+		ToggleFilterHeader,
+		ToggleDualPane,
 
 		// File System
 		CopyItem,
@@ -118,6 +120,7 @@ namespace Files.App.Data.Commands
 		OpenReleaseNotes,
 		OpenClassicProperties,
 		OpenSettings,
+		OpenSettingsFile,
 		OpenStorageSense,
 		OpenStorageSenseFromHome,
 		OpenStorageSenseFromSidebar,
@@ -127,6 +130,8 @@ namespace Files.App.Data.Commands
 		OpenTerminalFromHome,
 		OpenCommandPalette,
 		EditInNotepad,
+		OpenLogFile,
+		OpenLogFileLocation,
 
 		// Layout
 		LayoutDecreaseSize,
@@ -210,8 +215,8 @@ namespace Files.App.Data.Commands
 		// Shell Panes
 		CloseActivePane,
 		FocusOtherPane,
-		AddVerticalPane,
-		AddHorizontalPane,
+		SplitPaneVertically,
+		SplitPaneHorizontally,
 		ArrangePanesVertically,
 		ArrangePanesHorizontally,
 

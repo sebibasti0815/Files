@@ -16,7 +16,6 @@ using Windows.ApplicationModel.DataTransfer.DragDrop;
 using Windows.Storage;
 using Windows.System;
 using Windows.UI.Core;
-using OwlCore.Storage;
 
 namespace Files.App.ViewModels.UserControls
 {
@@ -59,6 +58,7 @@ namespace Files.App.ViewModels.UserControls
 				if (SetProperty(ref sidebarDisplayMode, value))
 				{
 					OnPropertyChanged(nameof(IsSidebarCompactSize));
+					OnPropertyChanged(nameof(AreSectionsHidden));
 					IsSidebarOpen = sidebarDisplayMode == SidebarDisplayMode.Expanded;
 					UpdateTabControlMargin();
 				}
@@ -133,6 +133,16 @@ namespace Files.App.ViewModels.UserControls
 				OnPropertyChanged();
 			}
 		}
+
+		public bool AreSectionsHidden =>
+			!ShowPinnedFoldersSection &&
+			!ShowLibrarySection &&
+			!ShowDrivesSection &&
+			!ShowCloudDrivesSection &&
+			!ShowNetworkSection &&
+			(!ShowWslSection || WSLDistroManager.Distros.Any() == false) &&
+			!ShowFileTagsSection &&
+			SidebarDisplayMode is not SidebarDisplayMode.Compact;
 
 		public bool ShowPinnedFoldersSection
 		{
@@ -635,30 +645,37 @@ namespace Files.App.ViewModels.UserControls
 				case nameof(UserSettingsService.GeneralSettingsService.ShowPinnedSection):
 					await UpdateSectionVisibilityAsync(SectionType.Pinned, ShowPinnedFoldersSection);
 					OnPropertyChanged(nameof(ShowPinnedFoldersSection));
+					OnPropertyChanged(nameof(AreSectionsHidden));
 					break;
 				case nameof(UserSettingsService.GeneralSettingsService.ShowLibrarySection):
 					await UpdateSectionVisibilityAsync(SectionType.Library, ShowLibrarySection);
 					OnPropertyChanged(nameof(ShowLibrarySection));
+					OnPropertyChanged(nameof(AreSectionsHidden));
 					break;
 				case nameof(UserSettingsService.GeneralSettingsService.ShowCloudDrivesSection):
 					await UpdateSectionVisibilityAsync(SectionType.CloudDrives, ShowCloudDrivesSection);
 					OnPropertyChanged(nameof(ShowCloudDrivesSection));
+					OnPropertyChanged(nameof(AreSectionsHidden));
 					break;
 				case nameof(UserSettingsService.GeneralSettingsService.ShowDrivesSection):
 					await UpdateSectionVisibilityAsync(SectionType.Drives, ShowDrivesSection);
 					OnPropertyChanged(nameof(ShowDrivesSection));
+					OnPropertyChanged(nameof(AreSectionsHidden));
 					break;
 				case nameof(UserSettingsService.GeneralSettingsService.ShowNetworkSection):
 					await UpdateSectionVisibilityAsync(SectionType.Network, ShowNetworkSection);
 					OnPropertyChanged(nameof(ShowNetworkSection));
+					OnPropertyChanged(nameof(AreSectionsHidden));
 					break;
 				case nameof(UserSettingsService.GeneralSettingsService.ShowWslSection):
 					await UpdateSectionVisibilityAsync(SectionType.WSL, ShowWslSection);
 					OnPropertyChanged(nameof(ShowWslSection));
+					OnPropertyChanged(nameof(AreSectionsHidden));
 					break;
 				case nameof(UserSettingsService.GeneralSettingsService.ShowFileTagsSection):
 					await UpdateSectionVisibilityAsync(SectionType.FileTag, ShowFileTagsSection);
 					OnPropertyChanged(nameof(ShowFileTagsSection));
+					OnPropertyChanged(nameof(AreSectionsHidden));
 					break;
 			}
 		}
@@ -1026,11 +1043,14 @@ namespace Files.App.ViewModels.UserControls
 				new ContextMenuFlyoutItemViewModel()
 				{
 					ItemType = ContextMenuFlyoutItemType.Separator,
-					ShowItem = Commands.OpenTerminalFromSidebar.IsExecutable ||
+					ShowItem = (UserSettingsService.GeneralSettingsService.ShowOpenTerminal && Commands.OpenTerminalFromSidebar.IsExecutable) ||
 						Commands.OpenStorageSenseFromSidebar.IsExecutable ||
 						Commands.FormatDriveFromSidebar.IsExecutable
 				},
-				new ContextMenuFlyoutItemViewModelBuilder(Commands.OpenTerminalFromSidebar).Build(),
+				new ContextMenuFlyoutItemViewModelBuilder(Commands.OpenTerminalFromSidebar)
+				{
+					IsVisible = UserSettingsService.GeneralSettingsService.ShowOpenTerminal && Commands.OpenTerminalFromSidebar.IsExecutable
+				}.Build(),
 				new ContextMenuFlyoutItemViewModelBuilder(Commands.OpenStorageSenseFromSidebar).Build(),
 				new ContextMenuFlyoutItemViewModelBuilder(Commands.FormatDriveFromSidebar).Build(),
 				new ContextMenuFlyoutItemViewModel()
@@ -1098,7 +1118,9 @@ namespace Files.App.ViewModels.UserControls
 				}
 				else if (isPathNull ||
 					(hasStorageItems && storageItems.AreItemsAlreadyInFolder(locationItem.Path)) ||
-					locationItem.Path.StartsWith("Home", StringComparison.OrdinalIgnoreCase))
+					locationItem.Path.StartsWith("Home", StringComparison.OrdinalIgnoreCase) ||
+					locationItem.Path.StartsWith("ReleaseNotes", StringComparison.OrdinalIgnoreCase) ||
+					locationItem.Path.StartsWith("Settings", StringComparison.OrdinalIgnoreCase))
 				{
 					rawEvent.AcceptedOperation = DataPackageOperation.None;
 				}

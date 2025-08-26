@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Files Community
 // Licensed under the MIT License.
 
-using Files.App.UserControls.TabBar;
 using System.Collections.Immutable;
 
 namespace Files.App.Data.Contexts
@@ -38,8 +37,6 @@ namespace Files.App.Data.Contexts
 		public bool CanGoForward => ShellPage is not null && ShellPage.ToolbarViewModel.CanGoForward;
 
 		public bool CanNavigateToParent => ShellPage is not null && ShellPage.ToolbarViewModel.CanNavigateToParent;
-
-		public bool IsSearchBoxVisible => ShellPage is not null && ShellPage.ToolbarViewModel.IsSearchBoxVisible;
 
 		public bool CanCreateItem => GetCanCreateItem();
 
@@ -94,7 +91,7 @@ namespace Files.App.Data.Contexts
 				page.ContentChanged += Page_ContentChanged;
 				page.InstanceViewModel.PropertyChanged += InstanceViewModel_PropertyChanged;
 				page.ToolbarViewModel.PropertyChanged += ToolbarViewModel_PropertyChanged;
-				
+
 				if (page.PaneHolder is not null)
 					page.PaneHolder.PropertyChanged += PaneHolder_PropertyChanged;
 			}
@@ -147,6 +144,8 @@ namespace Files.App.Data.Contexts
 				case nameof(CurrentInstanceViewModel.IsPageTypeCloudDrive):
 				case nameof(CurrentInstanceViewModel.IsPageTypeMtpDevice):
 				case nameof(CurrentInstanceViewModel.IsPageTypeSearchResults):
+				case nameof(CurrentInstanceViewModel.IsPageTypeReleaseNotes):
+				case nameof(CurrentInstanceViewModel.IsPageTypeSettings):
 					UpdatePageType();
 					break;
 				case nameof(CurrentInstanceViewModel.IsGitRepository):
@@ -165,7 +164,6 @@ namespace Files.App.Data.Contexts
 				case nameof(NavigationToolbarViewModel.CanNavigateToParent):
 				case nameof(NavigationToolbarViewModel.HasItem):
 				case nameof(NavigationToolbarViewModel.CanRefresh):
-				case nameof(NavigationToolbarViewModel.IsSearchBoxVisible):
 					OnPropertyChanged(e.PropertyName);
 					break;
 				case nameof(NavigationToolbarViewModel.SelectedItems):
@@ -210,6 +208,7 @@ namespace Files.App.Data.Contexts
 			{
 				null => ContentPageTypes.None,
 				{ IsPageTypeNotHome: false } => ContentPageTypes.Home,
+				{ IsPageTypeReleaseNotes: true } => ContentPageTypes.ReleaseNotes,
 				{ IsPageTypeRecycleBin: true } => ContentPageTypes.RecycleBin,
 				{ IsPageTypeZipFolder: true } => ContentPageTypes.ZipFolder,
 				{ IsPageTypeFtp: true } => ContentPageTypes.Ftp,
@@ -217,6 +216,7 @@ namespace Files.App.Data.Contexts
 				{ IsPageTypeCloudDrive: true } => ContentPageTypes.CloudDrive,
 				{ IsPageTypeMtpDevice: true } => ContentPageTypes.MtpDevice,
 				{ IsPageTypeSearchResults: true } => ContentPageTypes.SearchResults,
+				{ IsPageTypeSettings: true } => ContentPageTypes.Settings,
 				_ => ContentPageTypes.Folder,
 			};
 			SetProperty(ref pageType, type, nameof(PageType));
@@ -246,7 +246,9 @@ namespace Files.App.Data.Contexts
 				and not ContentPageTypes.RecycleBin
 				and not ContentPageTypes.ZipFolder
 				and not ContentPageTypes.SearchResults
-				and not ContentPageTypes.MtpDevice;
+				and not ContentPageTypes.MtpDevice
+				and not ContentPageTypes.ReleaseNotes
+				and not ContentPageTypes.Settings;
 		}
 	}
 }

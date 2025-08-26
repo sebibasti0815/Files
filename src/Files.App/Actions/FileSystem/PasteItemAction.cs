@@ -1,14 +1,6 @@
 ﻿// Copyright (c) Files Community
 // Licensed under the MIT License.
 
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.DependencyInjection;
-using Files.App.Data.Models;
-using Files.App.Extensions;
-using Files.App.Helpers;
-using System.ComponentModel;
-using System.Threading.Tasks;
-
 namespace Files.App.Actions
 {
 	internal sealed partial class PasteItemAction : ObservableObject, IAction
@@ -53,7 +45,9 @@ namespace Files.App.Actions
 				App.AppModel.IsPasteEnabled &&
 				context.PageType != ContentPageTypes.Home &&
 				context.PageType != ContentPageTypes.RecycleBin &&
-				context.PageType != ContentPageTypes.SearchResults;
+				context.PageType != ContentPageTypes.SearchResults &&
+				context.PageType != ContentPageTypes.ReleaseNotes &&
+				context.PageType != ContentPageTypes.Settings;
 		}
 
 		private void Context_PropertyChanged(object? sender, PropertyChangedEventArgs e)

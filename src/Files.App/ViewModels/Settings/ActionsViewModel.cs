@@ -20,6 +20,13 @@ namespace Files.App.ViewModels.Settings
 		public ObservableCollection<ModifiableActionItem> ValidActionItems { get; } = [];
 		public ObservableCollection<ModifiableActionItem> AllActionItems { get; } = [];
 
+		private ObservableCollection<ModifiableActionItem> _FilteredActionItems;
+		public ObservableCollection<ModifiableActionItem> FilteredActionItems
+		{
+			get { return _FilteredActionItems; }
+			set { SetProperty(ref _FilteredActionItems, value); }
+		}
+
 		private bool _IsResetAllConfirmationTeachingTipOpened;
 		public bool IsResetAllConfirmationTeachingTipOpened
 		{
@@ -68,6 +75,8 @@ namespace Files.App.ViewModels.Settings
 			get => _SelectedActionItem;
 			set => SetProperty(ref _SelectedActionItem, value);
 		}
+
+		private string _currentFilterQuery = string.Empty;
 
 		// Commands
 
@@ -148,6 +157,8 @@ namespace Files.App.ViewModels.Settings
 					}
 				}
 			});
+
+			FilteredActionItems = new ObservableCollection<ModifiableActionItem>(ValidActionItems);
 		}
 
 		private void ExecuteShowAddNewKeyBindingBlockCommand()
@@ -246,6 +257,9 @@ namespace Files.App.ViewModels.Settings
 
 			// Add to existing list
 			ValidActionItems.Insert(0, selectedNewItem);
+
+			// Refresh filtered list
+			FilterItems(_currentFilterQuery);
 		}
 
 		private void ExecuteShowRestoreDefaultsConfirmationCommand()
@@ -431,6 +445,28 @@ namespace Files.App.ViewModels.Settings
 			// Exit edit mode
 			item.IsInEditMode = false;
 			ValidActionItems.Remove(item);
+
+			// Refresh filtered list
+			FilterItems(_currentFilterQuery);
+		}
+
+		public void FilterItems(string query)
+		{
+			// Store the current filter query for later use
+			_currentFilterQuery = query ?? string.Empty;
+
+			if (string.IsNullOrEmpty(query))
+			{
+				FilteredActionItems = new ObservableCollection<ModifiableActionItem>(ValidActionItems);
+			}
+			else
+			{
+				FilteredActionItems = new ObservableCollection<ModifiableActionItem>(
+					ValidActionItems.Where(item =>
+						item.CommandLabel.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+						item.CommandDescription.Contains(query, StringComparison.OrdinalIgnoreCase))
+				);
+			}
 		}
 	}
 }

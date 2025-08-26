@@ -45,6 +45,12 @@ namespace Files.App.Utils.Cloud
 
 		LucidLink,
 
-		kDrive
+		kDrive,
+
+		SyncDrive,
+
+		MagentaCloud,
+
+		OXDrive
 	}
 }

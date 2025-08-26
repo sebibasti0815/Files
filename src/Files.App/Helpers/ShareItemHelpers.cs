@@ -1,12 +1,7 @@
 ﻿// Copyright (c) Files Community
 // Licensed under the MIT License.
 
-using Files.App.Extensions;
-using Files.App.Utils;
 using Microsoft.UI.Xaml.Controls;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Foundation.Metadata;
@@ -59,7 +54,7 @@ namespace Files.App.Helpers
 
 				foreach (ListedItem item in itemsToShare)
 				{
-					if (item is ShortcutItem shItem)
+					if (item is IShortcutItem shItem)
 					{
 						if (shItem.IsLinkItem && !string.IsNullOrEmpty(shItem.TargetPath))
 						{

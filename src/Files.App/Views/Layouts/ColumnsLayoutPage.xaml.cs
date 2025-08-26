@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using CommunityToolkit.WinUI;
-using CommunityToolkit.WinUI.Controls;
 using Files.App.Controls;
 using Files.App.ViewModels.Layouts;
 using Microsoft.UI.Xaml;
@@ -80,6 +79,16 @@ namespace Files.App.Views.Layouts
 				navigationArguments.NavPathParam = column.NavPathParam;
 				ParentShellPageInstance.TabBarItemParameter.NavigationParameter = column.NavPathParam;
 			}
+		}
+
+		public void SetWidth(int index)
+		{
+			var activeBlades = ColumnHost.ActiveBlades;
+			if (index < 0 || activeBlades is null || index >= activeBlades.Count)
+				return;
+
+			var blade = activeBlades[index];
+			blade?.SetWidth();
 		}
 
 		private void ContentChanged(IShellPage p)

@@ -140,6 +140,11 @@ namespace Files.App.Utils.Storage
 			{
 				if (item.Path == "Home")
 					item.Title = Strings.Home.GetLocalizedResource();
+				if (item.Path == "ReleaseNotes")
+					item.Title = Strings.ReleaseNotes.GetLocalizedResource();
+				// TODO add settings page
+				//if (item.Path == "Settings")
+				//	item.Title = Strings.Settings.GetLocalizedResource();
 				else
 				{
 					BaseStorageFolder folder = await FilesystemTasks.Wrap(() => DangerousGetFolderFromPathAsync(item.Path));
@@ -147,6 +152,8 @@ namespace Files.App.Utils.Storage
 					if (!string.IsNullOrEmpty(folder?.DisplayName))
 						item.Title = folder.DisplayName;
 				}
+
+				item.ChevronToolTip = string.Format(Strings.BreadcrumbBarChevronButtonToolTip.GetLocalizedResource(), item.Title);
 			}
 
 			return pathBoxItems;
@@ -316,7 +323,8 @@ namespace Files.App.Utils.Storage
 			return new PathBoxItem()
 			{
 				Title = title,
-				Path = path
+				Path = path,
+				ChevronToolTip = string.Format(Strings.BreadcrumbBarChevronButtonToolTip.GetLocalizedResource(), title),
 			};
 		}
 
@@ -340,6 +348,12 @@ namespace Files.App.Utils.Storage
 		{
 			if (path.StartsWith("Home"))
 				return "Home";
+
+			if (path.StartsWith("ReleaseNotes"))
+				return "ReleaseNotes";
+
+			if (path.StartsWith("Settings"))
+				return "Settings";
 
 			if (ShellStorageFolder.IsShellPath(path))
 				return ShellHelpers.ResolveShellPath(path);

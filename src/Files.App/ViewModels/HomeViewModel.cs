@@ -1,7 +1,6 @@
 // Copyright (c) Files Community
 // Licensed under the MIT License.
 
-using Microsoft.UI.Xaml;
 using System.Windows.Input;
 
 namespace Files.App.ViewModels
@@ -18,13 +17,13 @@ namespace Files.App.ViewModels
 
 		// Commands
 
-		public ICommand HomePageLoadedCommand { get; }
+		public ICommand ReloadWidgetsCommand { get; }
 
 		// Constructor
 
 		public HomeViewModel()
 		{
-			HomePageLoadedCommand = new RelayCommand<RoutedEventArgs>(ExecuteHomePageLoadedCommand);
+			ReloadWidgetsCommand = new AsyncRelayCommand(ExecuteReloadWidgetsCommand);
 		}
 
 		// Methods
@@ -115,9 +114,10 @@ namespace Files.App.ViewModels
 			ReloadWidgets();
 		}
 
-		public Task RefreshWidgetProperties()
+		public async Task RefreshWidgetProperties()
 		{
-			return Task.WhenAll(WidgetItems.Select(w => w.WidgetItemModel.RefreshWidgetAsync()));
+			foreach (var viewModel in WidgetItems.Select(x => x.WidgetItemModel))
+				await viewModel.RefreshWidgetAsync();
 		}
 
 		private bool InsertWidget(WidgetContainerItem widgetModel, int atIndex)
@@ -181,7 +181,7 @@ namespace Files.App.ViewModels
 
 		// Command methods
 
-		private async void ExecuteHomePageLoadedCommand(RoutedEventArgs? e)
+		private async Task ExecuteReloadWidgetsCommand()
 		{
 			ReloadWidgets();
 			await RefreshWidgetProperties();

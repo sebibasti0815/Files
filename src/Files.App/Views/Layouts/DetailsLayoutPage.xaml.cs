@@ -37,6 +37,8 @@ namespace Files.App.Views.Layouts
 		/// </summary>
 		private uint currentIconSize;
 
+		private RectangleSelection? _rectangleSelection;
+
 		// Properties
 
 		protected override ListViewBase ListViewBase => FileList;
@@ -77,8 +79,8 @@ namespace Files.App.Views.Layouts
 		{
 			InitializeComponent();
 			DataContext = this;
-			var selectionRectangle = RectangleSelection.Create(FileList, SelectionRectangle, FileList_SelectionChanged);
-			selectionRectangle.SelectionEnded += SelectionRectangle_SelectionEnded;
+			_rectangleSelection = RectangleSelection.Create(FileList, SelectionRectangle, FileList_SelectionChanged);
+			_rectangleSelection.SelectionEnded += SelectionRectangle_SelectionEnded;
 
 			UpdateSortOptionsCommand = new RelayCommand<string>(x =>
 			{
@@ -202,6 +204,11 @@ namespace Files.App.Views.Layouts
 			FolderSettings.SortOptionPreferenceUpdated -= FolderSettings_SortOptionPreferenceUpdated;
 			ParentShellPageInstance.ShellViewModel.PageTypeUpdated -= FilesystemViewModel_PageTypeUpdated;
 			UserSettingsService.LayoutSettingsService.PropertyChanged -= LayoutSettingsService_PropertyChanged;
+			if (_rectangleSelection is not null)
+			{
+				_rectangleSelection.SelectionEnded -= SelectionRectangle_SelectionEnded;
+				_rectangleSelection = null;
+			}
 		}
 
 		private void LayoutSettingsService_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -479,8 +486,7 @@ namespace Files.App.Views.Layouts
 			}
 			else if (e.Key == VirtualKey.Space)
 			{
-				if (!ParentShellPageInstance.ToolbarViewModel.IsEditModeEnabled)
-					e.Handled = true;
+				e.Handled = true;
 			}
 			else if (e.KeyStatus.IsMenuKeyDown && (e.Key == VirtualKey.Left || e.Key == VirtualKey.Right || e.Key == VirtualKey.Up))
 			{
@@ -494,7 +500,9 @@ namespace Files.App.Views.Layouts
 			}
 			else if (e.Key == VirtualKey.Down)
 			{
-				if (isHeaderFocused && !ParentShellPageInstance.ToolbarViewModel.IsEditModeEnabled)
+				// Focus the first item in the file list if Header header has focus,
+				// or if there is only one item in the file list (#13774)
+				if (isHeaderFocused || FileList.Items.Count == 1)
 				{
 					var selectIndex = FileList.SelectedIndex < 0 ? 0 : FileList.SelectedIndex;
 					if (FileList.ContainerFromIndex(selectIndex) is ListViewItem item)
@@ -558,6 +566,13 @@ namespace Files.App.Views.Layouts
 						if (textBox is not null)
 							await CommitRenameAsync(textBox);
 					}
+				}
+				else
+				{
+					// Clear selection when clicking empty area via touch
+					// https://github.com/files-community/Files/issues/15051
+					if (e.PointerDeviceType == PointerDeviceType.Touch)
+						ItemManipulationModel.ClearSelection();
 				}
 				return;
 			}
@@ -883,8 +898,18 @@ namespace Files.App.Views.Layouts
 
 		private void ItemSelected_Unchecked(object sender, RoutedEventArgs e)
 		{
-			if (sender is CheckBox checkBox && checkBox.DataContext is ListedItem item && FileList.SelectedItems.Contains(item))
+			if (sender is not CheckBox checkBox)
+				return;
+
+			if (checkBox.DataContext is ListedItem item && FileList.SelectedItems.Contains(item))
 				FileList.SelectedItems.Remove(item);
+
+			// Workaround for #17298
+			checkBox.IsTabStop = false;
+			checkBox.IsEnabled = false;
+			checkBox.IsEnabled = true;
+			checkBox.IsTabStop = true;
+			FileList.Focus(FocusState.Programmatic);
 		}
 
 		private new void FileList_ContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)

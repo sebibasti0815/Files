@@ -63,7 +63,7 @@ namespace Files.App.ViewModels.UserControls.Widgets
 				if (_updateCTS.IsCancellationRequested)
 					break;
 
-				var matchingItem = Containers.First(c => c.Uid == item.Uid);
+				var matchingItem = Containers.FirstOrDefault(c => c.Uid == item.Uid);
 				if (matchingItem is null)
 				{
 					CreateTagContainerItem(item);
@@ -154,9 +154,12 @@ namespace Files.App.ViewModels.UserControls.Widgets
 				new ContextMenuFlyoutItemViewModel()
 				{
 					ItemType = ContextMenuFlyoutItemType.Separator,
-					ShowItem = CommandManager.OpenTerminalFromHome.IsExecutable
+					ShowItem = UserSettingsService.GeneralSettingsService.ShowOpenTerminal && CommandManager.OpenTerminalFromHome.IsExecutable,
 				},
-				new ContextMenuFlyoutItemViewModelBuilder(CommandManager.OpenTerminalFromHome).Build(),
+				new ContextMenuFlyoutItemViewModelBuilder(CommandManager.OpenTerminalFromHome)
+				{
+					IsVisible = UserSettingsService.GeneralSettingsService.ShowOpenTerminal && CommandManager.OpenTerminalFromHome.IsExecutable
+				}.Build(),
 				new()
 				{
 					ItemType = ContextMenuFlyoutItemType.Separator,

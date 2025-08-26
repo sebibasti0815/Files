@@ -1,9 +1,6 @@
 ﻿// Copyright (c) Files Community
 // Licensed under the MIT License.
 
-using Files.App.Extensions;
-using Files.Shared;
-using System;
 using System.IO;
 
 namespace Files.App.Utils.Shell
@@ -29,6 +26,8 @@ namespace Files.App.Utils.Shell
 			return shPath switch
 			{
 				"Home" => Strings.Home.GetLocalizedResource(),
+				"ReleaseNotes" => Strings.ReleaseNotes.GetLocalizedResource(),
+				"Settings" => Strings.Settings.GetLocalizedResource(),
 				Constants.UserEnvironmentPaths.RecycleBinPath => Strings.RecycleBin.GetLocalizedResource(),
 				Constants.UserEnvironmentPaths.NetworkFolderPath => Strings.Network.GetLocalizedResource(),
 				Constants.UserEnvironmentPaths.MyComputerPath => Strings.ThisPC.GetLocalizedResource(),

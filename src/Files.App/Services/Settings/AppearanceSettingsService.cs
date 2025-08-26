@@ -146,16 +146,16 @@ namespace Files.App.Services.Settings
 		}
 
 		/// <inheritdoc/>
-		public bool ShowHomeButton
+		public bool ShowShelfPaneToggleButton
 		{
 			get => Get(false);
 			set => Set(value);
 		}
 
 		/// <inheritdoc/>
-		public bool ShowShelfPaneToggleButton
+		public StatusCenterVisibility StatusCenterVisibility
 		{
-			get => Get(false);
+			get => Get(StatusCenterVisibility.Always);
 			set => Set(value);
 		}
 

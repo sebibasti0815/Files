@@ -289,7 +289,7 @@ namespace Files.App.Views.Layouts
 			catch (COMException)
 			{
 
-			}			
+			}
 		}
 
 		// Methods
@@ -310,6 +310,11 @@ namespace Files.App.Views.Layouts
 				case VirtualKey.Enter:
 					textBox.LostFocus -= RenameTextBox_LostFocus;
 					await CommitRenameAsync(textBox);
+					e.Handled = true;
+					break;
+				case VirtualKey.Home:
+					textBox.SelectionStart = 0;
+					textBox.SelectionLength = 0;
 					e.Handled = true;
 					break;
 				case VirtualKey.Up:

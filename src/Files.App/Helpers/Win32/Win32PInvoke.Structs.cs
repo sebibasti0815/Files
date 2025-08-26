@@ -3,7 +3,8 @@
 
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
+using Windows.Win32.Foundation;
+using Windows.Win32.Security.Cryptography;
 
 namespace Files.App.Helpers
 {
@@ -90,9 +91,9 @@ namespace Files.App.Helpers
 		public struct WIN32_FILE_ATTRIBUTE_DATA
 		{
 			public FileAttributes dwFileAttributes;
-			public FILETIME ftCreationTime;
-			public FILETIME ftLastAccessTime;
-			public FILETIME ftLastWriteTime;
+			public System.Runtime.InteropServices.ComTypes.FILETIME ftCreationTime;
+			public System.Runtime.InteropServices.ComTypes.FILETIME ftLastAccessTime;
+			public System.Runtime.InteropServices.ComTypes.FILETIME ftLastWriteTime;
 			public uint nFileSizeHigh;
 			public uint nFileSizeLow;
 		}
@@ -140,24 +141,11 @@ namespace Files.App.Helpers
 		}
 
 		[StructLayout(LayoutKind.Sequential)]
-		public struct TOKEN_USER
-		{
-			public SID_AND_ATTRIBUTES User;
-		}
-
-		[StructLayout(LayoutKind.Sequential)]
 		public struct SID_AND_ATTRIBUTES
 		{
 			public IntPtr Sid;
 
 			public uint Attributes;
-		}
-
-		[StructLayout(LayoutKind.Sequential)]
-		public struct CRYPTOAPI_BLOB
-		{
-			public uint cbData;
-			public IntPtr pbData;
 		}
 
 		[StructLayout(LayoutKind.Sequential)]
@@ -196,9 +184,9 @@ namespace Files.App.Helpers
 		{
 			public uint dwFileAttributes;
 
-			public FILETIME ftCreationTime;
-			public FILETIME ftLastAccessTime;
-			public FILETIME ftLastWriteTime;
+			public System.Runtime.InteropServices.ComTypes.FILETIME ftCreationTime;
+			public System.Runtime.InteropServices.ComTypes.FILETIME ftLastAccessTime;
+			public System.Runtime.InteropServices.ComTypes.FILETIME ftLastWriteTime;
 
 			public uint nFileSizeHigh;
 			public uint nFileSizeLow;
@@ -213,14 +201,35 @@ namespace Files.App.Helpers
 		}
 
 		[StructLayout(LayoutKind.Sequential)]
-		public struct MSG
+		public unsafe struct SignDataHandle
 		{
-			public IntPtr hwnd;
-			public uint message;
-			public IntPtr wParam;
-			public IntPtr lParam;
-			public uint time;
-			public System.Drawing.Point pt;
+			public uint dwObjSize;
+			public CMSG_SIGNER_INFO* pSignerInfo;
+			public HCERTSTORE hCertStoreHandle;
+		}
+
+		[StructLayout(LayoutKind.Sequential)]
+		public unsafe struct CRYPTOAPI_BLOB
+		{
+			public uint cbData;
+			public void* pbData;
+		}
+
+		[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+		public unsafe struct CRYPTUI_VIEWSIGNERINFO_STRUCT
+		{
+			public uint dwSize;
+			public HWND hwndParent;
+			public uint dwFlags;
+			public PCSTR szTitle;
+			public CMSG_SIGNER_INFO* pSignerInfo;
+			public void* hMsg;
+			public PCSTR pszOID;
+			public uint? dwReserved;
+			public uint cStores;
+			public HCERTSTORE* rghStores;
+			public uint cPropPages;
+			public void* rgPropPages;
 		}
 	}
 }

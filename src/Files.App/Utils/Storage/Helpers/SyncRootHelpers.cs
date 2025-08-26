@@ -2,9 +2,7 @@
 // Licensed under the MIT License.
 
 using Microsoft.Win32;
-using System.Runtime.CompilerServices;
 using Windows.Win32;
-using Windows.Win32.Foundation;
 using Windows.Win32.System.Com;
 using Windows.Win32.System.WinRT;
 using WinRT;
@@ -20,7 +18,6 @@ namespace Files.App.Utils.Storage
 				!Guid.TryParse(factoryClsidString, out var factoryClsid))
 				return (false, 0, 0);
 
-			HRESULT hr = default;
 			ulong ulTotalSize = 0ul, ulUsedSize = 0ul;
 			using ComPtr<IStorageProviderStatusUISourceFactory> pStorageProviderStatusUISourceFactory = default;
 			using ComPtr<IStorageProviderStatusUISource> pStorageProviderStatusUISource = default;
@@ -31,7 +28,7 @@ namespace Files.App.Utils.Storage
 				&factoryClsid,
 				null,
 				CLSCTX.CLSCTX_LOCAL_SERVER,
-				(Guid*)Unsafe.AsPointer(ref Unsafe.AsRef(in IStorageProviderStatusUISourceFactory.Guid)),
+				IID.IID_IStorageProviderStatusUISourceFactory,
 				(void**)pStorageProviderStatusUISourceFactory.GetAddressOf()).ThrowIfFailedOnDebug().Failed)
 				return (false, 0, 0);
 
@@ -59,6 +56,11 @@ namespace Files.App.Utils.Storage
 				syncRootInfo = Windows.Storage.Provider.StorageProviderSyncRootManager.GetSyncRootInformationForFolder(folder);
 			}
 			catch
+			{
+				return (false, 0, 0);
+			}
+
+			if (syncRootInfo is null || syncRootInfo.Id is null)
 			{
 				return (false, 0, 0);
 			}

@@ -9,6 +9,8 @@
 	xmlns:converters="using:Files.App.Converters"
 	xmlns:converters1="using:CommunityToolkit.WinUI.Converters"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:dataitems="using:Files.App.Data.Items"
+	xmlns:datamodels="using:Files.App.Data.Models"
 	xmlns:helpers="using:Files.App.Helpers"
 	xmlns:items="using:Files.App.Data.Items"
 	xmlns:keyboard="using:Files.App.UserControls.KeyboardShortcut"
@@ -19,19 +21,23 @@
 	xmlns:ucs="using:Files.App.UserControls.StatusCenter"
 	xmlns:vm="using:Files.App.ViewModels.UserControls"
 	x:Name="NavToolbar"
-	Height="50"
-	d:DesignHeight="50"
-	d:DesignWidth="800"
 	Loading="NavToolbar_Loading"
 	mc:Ignorable="d">
 
 	<UserControl.Resources>
 		<ResourceDictionary>
 			<converters:NullToTrueConverter x:Key="NullToFalseConverter" Inverse="True" />
+			<converters:NullToVisibilityCollapsedConverter x:Key="NullToVisibilityCollapsedConverter" />
 			<converters1:BoolNegationConverter x:Key="BoolNegationConverter" />
+			<converters:VisibilityInvertConverter x:Key="VisibilityInvertConverter" />
+			<converters1:BoolToObjectConverter
+				x:Key="SearchSuggestionGlyphConverter"
+				FalseValue="&#xE7C3;"
+				TrueValue="&#xE81C;" />
 
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary Source="ms-appx:///UserControls/KeyboardShortcut/KeyboardShortcut.xaml" />
+				<ResourceDictionary Source="ms-appx:///Styles/StatusCenterInfoBadgeStyles.xaml" />
 
 				<ResourceDictionary>
 					<SolidColorBrush x:Key="ButtonBorderBrushDisabled" Color="Transparent" />
@@ -50,606 +56,522 @@
 						<Setter Property="Foreground" Value="{ThemeResource App.Theme.IconBaseBrush}" />
 					</Style>
 
-					<Style x:Key="DefaultInfoBadgeStyle" TargetType="InfoBadge">
-						<Setter Property="MinHeight" Value="{ThemeResource InfoBadgeMinHeight}" />
-						<Setter Property="MinWidth" Value="{ThemeResource InfoBadgeMinWidth}" />
-						<Setter Property="MaxHeight" Value="{ThemeResource InfoBadgeMaxHeight}" />
-						<Setter Property="Background" Value="{ThemeResource InfoBadgeBackground}" />
-						<Setter Property="Foreground" Value="{ThemeResource InfoBadgeForeground}" />
-						<Setter Property="Padding" Value="{ThemeResource InfoBadgePadding}" />
-						<Setter Property="IsTabStop" Value="False" />
-						<Setter Property="Template">
-							<Setter.Value>
-								<ControlTemplate TargetType="InfoBadge">
-									<Grid
-										x:Name="RootGrid"
-										Padding="{TemplateBinding Padding}"
-										Background="{TemplateBinding Background}"
-										CornerRadius="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.InfoBadgeCornerRadius}">
-										<TextBlock
-											x:Name="ValueTextBlock"
-											HorizontalAlignment="Center"
-											VerticalAlignment="Center"
-											FontSize="{ThemeResource InfoBadgeValueFontSize}"
-											Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Value, Mode=OneWay}"
-											Visibility="Collapsed" />
-										<Viewbox
-											x:Name="IconPresenter"
-											HorizontalAlignment="Center"
-											VerticalAlignment="Stretch"
-											Visibility="Collapsed">
-											<IconSourceElement IconSource="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=IconSource, Mode=OneWay}" />
-										</Viewbox>
-										<VisualStateManager.VisualStateGroups>
-											<VisualStateGroup x:Name="DisplayKindStates">
-												<VisualState x:Name="Dot" />
-												<VisualState x:Name="Icon">
-													<VisualState.Setters>
-														<Setter Target="IconPresenter.Visibility" Value="Visible" />
-														<Setter Target="IconPresenter.Margin" Value="{ThemeResource IconInfoBadgeIconMargin}" />
-													</VisualState.Setters>
-												</VisualState>
-												<VisualState x:Name="FontIcon">
-													<VisualState.Setters>
-														<Setter Target="IconPresenter.Visibility" Value="Visible" />
-														<Setter Target="IconPresenter.Margin" Value="{ThemeResource IconInfoBadgeFontIconMargin}" />
-													</VisualState.Setters>
-												</VisualState>
-												<VisualState x:Name="Value">
-													<VisualState.Setters>
-														<Setter Target="ValueTextBlock.Visibility" Value="Visible" />
-														<Setter Target="ValueTextBlock.Margin" Value="{ThemeResource ValueInfoBadgeTextMargin}" />
-													</VisualState.Setters>
-												</VisualState>
-											</VisualStateGroup>
-										</VisualStateManager.VisualStateGroups>
-									</Grid>
-								</ControlTemplate>
-							</Setter.Value>
-						</Setter>
-					</Style>
-					<Style
-						x:Key="AttentionDotInfoBadgeStyle"
-						BasedOn="{StaticResource DefaultInfoBadgeStyle}"
-						TargetType="InfoBadge">
-						<Setter Property="Background" Value="{ThemeResource SystemFillColorAttentionBrush}" />
-					</Style>
-					<Style
-						x:Key="AttentionValueInfoBadgeStyle"
-						BasedOn="{StaticResource AttentionDotInfoBadgeStyle}"
-						TargetType="InfoBadge" />
-					<Style
-						x:Key="AttentionIconInfoBadgeStyle"
-						BasedOn="{StaticResource AttentionDotInfoBadgeStyle}"
-						TargetType="InfoBadge">
-						<Setter Property="Padding" Value="0,4,0,2" />
-						<Setter Property="IconSource">
-							<Setter.Value>
-								<FontIconSource Glyph="&#xEA38;" />
-							</Setter.Value>
-						</Setter>
-					</Style>
-					<Style
-						x:Key="InformationalDotInfoBadgeStyle"
-						BasedOn="{StaticResource DefaultInfoBadgeStyle}"
-						TargetType="InfoBadge">
-						<Setter Property="Background" Value="{ThemeResource SystemFillColorSolidNeutralBrush}" />
-					</Style>
-					<Style
-						x:Key="InformationalValueInfoBadgeStyle"
-						BasedOn="{StaticResource InformationalDotInfoBadgeStyle}"
-						TargetType="InfoBadge" />
-					<Style
-						x:Key="InformationalIconInfoBadgeStyle"
-						BasedOn="{StaticResource InformationalDotInfoBadgeStyle}"
-						TargetType="InfoBadge">
-						<Setter Property="Padding" Value="0,4,0,2" />
-						<Setter Property="IconSource">
-							<Setter.Value>
-								<FontIconSource Glyph="&#xF13F;" />
-							</Setter.Value>
-						</Setter>
-					</Style>
-					<Style
-						x:Key="SuccessDotInfoBadgeStyle"
-						BasedOn="{StaticResource DefaultInfoBadgeStyle}"
-						TargetType="InfoBadge">
-						<Setter Property="Background" Value="{ThemeResource SystemFillColorSuccessBrush}" />
-					</Style>
-					<Style
-						x:Key="SuccessValueInfoBadgeStyle"
-						BasedOn="{StaticResource SuccessDotInfoBadgeStyle}"
-						TargetType="InfoBadge" />
-					<Style
-						x:Key="SuccessIconInfoBadgeStyle"
-						BasedOn="{StaticResource SuccessDotInfoBadgeStyle}"
-						TargetType="InfoBadge">
-						<Setter Property="IconSource">
-							<Setter.Value>
-								<SymbolIconSource Symbol="Accept" />
-							</Setter.Value>
-						</Setter>
-					</Style>
-					<Style
-						x:Key="CautionDotInfoBadgeStyle"
-						BasedOn="{StaticResource DefaultInfoBadgeStyle}"
-						TargetType="InfoBadge">
-						<Setter Property="Background" Value="{ThemeResource SystemFillColorCautionBrush}" />
-					</Style>
-					<Style
-						x:Key="CautionValueInfoBadgeStyle"
-						BasedOn="{StaticResource CautionDotInfoBadgeStyle}"
-						TargetType="InfoBadge" />
-					<Style
-						x:Key="CautionIconInfoBadgeStyle"
-						BasedOn="{StaticResource CautionDotInfoBadgeStyle}"
-						TargetType="InfoBadge">
-						<Setter Property="IconSource">
-							<Setter.Value>
-								<SymbolIconSource Symbol="Important" />
-							</Setter.Value>
-						</Setter>
-					</Style>
-					<Style
-						x:Key="CriticalDotInfoBadgeStyle"
-						BasedOn="{StaticResource DefaultInfoBadgeStyle}"
-						TargetType="InfoBadge">
-						<Setter Property="Background" Value="{ThemeResource SystemFillColorCriticalBrush}" />
-					</Style>
-					<Style
-						x:Key="CriticalValueInfoBadgeStyle"
-						BasedOn="{StaticResource CriticalDotInfoBadgeStyle}"
-						TargetType="InfoBadge" />
-					<Style
-						x:Key="CriticalIconInfoBadgeStyle"
-						BasedOn="{StaticResource CriticalDotInfoBadgeStyle}"
-						TargetType="InfoBadge">
-						<Setter Property="IconSource">
-							<Setter.Value>
-								<SymbolIconSource Symbol="Cancel" />
-							</Setter.Value>
-						</Setter>
-					</Style>
 				</ResourceDictionary>
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 	</UserControl.Resources>
 
-	<Grid x:Name="RootGrid" Background="{ThemeResource App.Theme.AddressBar.BackgroundBrush}">
-		<Grid Padding="8" ColumnSpacing="4">
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="Auto" />
-				<ColumnDefinition Width="*" />
-				<ColumnDefinition Width="Auto" />
-				<ColumnDefinition Width="Auto" />
-			</Grid.ColumnDefinitions>
+	<Grid
+		Height="48"
+		Padding="4,0,4,0"
+		Background="{ThemeResource App.Theme.AddressBar.BackgroundBrush}"
+		ColumnSpacing="4">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="*" />
+			<ColumnDefinition Width="Auto" />
+		</Grid.ColumnDefinitions>
 
-			<!--  Listary Integration  -->
-			<Grid Width="0" Height="0">
-				<!--  Contains the current path  -->
-				<TextBox AutomationProperties.AutomationId="CurrentPathGet" Text="{x:Bind ViewModel.PathControlDisplayText, Mode=OneWay}" />
+		<!--  Listary Integration  -->
+		<Grid Width="0" Height="0">
+			<!--  Contains the current path  -->
+			<TextBox AutomationProperties.AutomationId="CurrentPathGet" Text="{x:Bind ViewModel.PathControlDisplayText, Mode=OneWay}" />
 
-				<!--  Modifies the current path  -->
-				<TextBox
-					x:Name="CurrentPathSetTextBox"
-					AutomationProperties.AutomationId="CurrentPathSet"
-					TextChanged="{x:Bind ViewModel.CurrentPathSetTextBox_TextChanged, Mode=OneWay}" />
-			</Grid>
-
-			<!--  Page Navigation Actions  -->
-			<StackPanel
-				Grid.Column="0"
-				Orientation="Horizontal"
-				Spacing="4">
-
-				<ToggleButton
-					x:Name="SidebarPaneToggleButton"
-					Width="36"
-					Height="32"
-					Padding="0"
-					x:Load="{x:Bind IsSidebarPaneOpenToggleButtonVisible, Mode=OneWay}"
-					AutomationProperties.Name="ToggleSidebarPane"
-					Background="Transparent"
-					BorderBrush="Transparent"
-					IsChecked="{x:Bind MainPageViewModel.IsSidebarPaneOpen, Mode=TwoWay}"
-					ToolTipService.ToolTip="{helpers:ResourceString Name=ToggleSidebar}">
-					<AnimatedIcon Width="14">
-						<AnimatedIcon.Source>
-							<animatedvisuals:AnimatedGlobalNavigationButtonVisualSource />
-						</AnimatedIcon.Source>
-						<AnimatedIcon.FallbackIconSource>
-							<SymbolIconSource Symbol="GlobalNavigationButton" />
-						</AnimatedIcon.FallbackIconSource>
-					</AnimatedIcon>
-				</ToggleButton>
-
-				<Button
-					x:Name="Back"
-					AccessKey="B"
-					AccessKeyInvoked="Button_AccessKeyInvoked"
-					AutomationProperties.FullDescription="{x:Bind Commands.NavigateBack.Description, Mode=OneWay}"
-					AutomationProperties.Name="{x:Bind Commands.NavigateBack.Label, Mode=OneWay}"
-					Command="{x:Bind Commands.NavigateBack, Mode=OneWay}"
-					IsEnabled="{x:Bind Commands.NavigateBack.IsExecutable, Mode=OneWay}"
-					Style="{StaticResource AddressToolbarButtonStyle}"
-					ToolTipService.ToolTip="{x:Bind Commands.NavigateBack.LabelWithHotKey, Mode=OneWay}">
-					<FontIcon FontSize="14" Glyph="{x:Bind Commands.NavigateBack.Glyph.BaseGlyph, Mode=OneTime}" />
-					<Button.ContextFlyout>
-						<MenuFlyout
-							x:Name="BackHistoryFlyout"
-							AreOpenCloseAnimationsEnabled="False"
-							Opening="BackHistoryFlyout_Opening"
-							Placement="BottomEdgeAlignedLeft"
-							ScrollViewer.VerticalScrollBarVisibility="Auto"
-							ScrollViewer.VerticalScrollMode="Auto">
-							<MenuFlyout.MenuFlyoutPresenterStyle>
-								<Style TargetType="MenuFlyoutPresenter">
-									<Setter Property="MaxHeight" Value="400" />
-									<!--  Workaround for https://github.com/files-community/Files/issues/13078  -->
-									<Setter Target="HighContrastAdjustment" Value="None" />
-								</Style>
-							</MenuFlyout.MenuFlyoutPresenterStyle>
-						</MenuFlyout>
-					</Button.ContextFlyout>
-				</Button>
-
-				<Button
-					x:Name="Forward"
-					AccessKey="F"
-					AccessKeyInvoked="Button_AccessKeyInvoked"
-					AutomationProperties.FullDescription="{x:Bind Commands.NavigateForward.Description, Mode=OneWay}"
-					AutomationProperties.Name="{x:Bind Commands.NavigateForward.Label, Mode=OneWay}"
-					Command="{x:Bind Commands.NavigateForward, Mode=OneWay}"
-					IsEnabled="{x:Bind Commands.NavigateForward.IsExecutable, Mode=OneWay}"
-					Style="{StaticResource AddressToolbarButtonStyle}"
-					ToolTipService.ToolTip="{x:Bind Commands.NavigateForward.LabelWithHotKey, Mode=OneWay}">
-					<FontIcon FontSize="14" Glyph="{x:Bind Commands.NavigateForward.Glyph.BaseGlyph, Mode=OneTime}" />
-					<Button.ContextFlyout>
-						<MenuFlyout
-							x:Name="ForwardHistoryFlyout"
-							AreOpenCloseAnimationsEnabled="False"
-							Opening="ForwardHistoryFlyout_Opening"
-							Placement="BottomEdgeAlignedLeft"
-							ScrollViewer.VerticalScrollBarVisibility="Auto"
-							ScrollViewer.VerticalScrollMode="Auto">
-							<MenuFlyout.MenuFlyoutPresenterStyle>
-								<Style TargetType="MenuFlyoutPresenter">
-									<Setter Property="MaxHeight" Value="400" />
-									<!--  Workaround for https://github.com/files-community/Files/issues/13078  -->
-									<Setter Target="HighContrastAdjustment" Value="None" />
-								</Style>
-							</MenuFlyout.MenuFlyoutPresenterStyle>
-						</MenuFlyout>
-					</Button.ContextFlyout>
-				</Button>
-
-				<Button
-					x:Name="Up"
-					AccessKey="U"
-					AccessKeyInvoked="Button_AccessKeyInvoked"
-					AutomationProperties.FullDescription="{x:Bind Commands.NavigateUp.Description, Mode=OneWay}"
-					AutomationProperties.Name="{x:Bind Commands.NavigateUp.Label, Mode=OneWay}"
-					Command="{x:Bind Commands.NavigateUp, Mode=OneWay}"
-					IsEnabled="{x:Bind Commands.NavigateUp.IsExecutable, Mode=OneWay}"
-					Style="{StaticResource AddressToolbarButtonStyle}"
-					ToolTipService.ToolTip="{x:Bind Commands.NavigateUp.LabelWithHotKey, Mode=OneWay}">
-					<FontIcon FontSize="14" Glyph="{x:Bind Commands.NavigateUp.Glyph.BaseGlyph, Mode=OneTime}" />
-				</Button>
-
-				<Button
-					x:Name="Refresh"
-					AccessKey="R"
-					AccessKeyInvoked="Button_AccessKeyInvoked"
-					AutomationProperties.Name="{x:Bind Commands.RefreshItems.Label, Mode=OneWay}"
-					Command="{x:Bind Commands.RefreshItems, Mode=OneWay}"
-					IsEnabled="{x:Bind Commands.RefreshItems.IsExecutable, Mode=OneWay}"
-					Style="{StaticResource AddressToolbarButtonStyle}"
-					ToolTipService.ToolTip="{x:Bind Commands.RefreshItems.LabelWithHotKey, Mode=OneWay}">
-					<FontIcon FontSize="14" Glyph="{x:Bind Commands.RefreshItems.Glyph.BaseGlyph, Mode=OneTime}" />
-				</Button>
-
-				<Button
-					x:Name="HomeButton"
-					x:Load="{x:Bind ViewModel.ShowHomeButton, Mode=OneWay}"
-					AccessKey="H"
-					AccessKeyInvoked="Button_AccessKeyInvoked"
-					AutomationProperties.Name="{x:Bind Commands.NavigateHome.Label, Mode=OneWay}"
-					Command="{x:Bind Commands.NavigateHome, Mode=OneWay}"
-					IsEnabled="{x:Bind Commands.NavigateHome.IsExecutable, Mode=OneWay}"
-					Style="{StaticResource AddressToolbarButtonStyle}"
-					ToolTipService.ToolTip="{x:Bind Commands.NavigateHome.LabelWithHotKey, Mode=OneWay}">
-					<FontIcon FontSize="14" Glyph="{x:Bind Commands.NavigateHome.Glyph.BaseGlyph, Mode=OneTime}" />
-				</Button>
-			</StackPanel>
-
-			<!--  Path Box  -->
-			<AutoSuggestBox
-				x:Name="VisiblePath"
-				Grid.Column="1"
-				HorizontalAlignment="Stretch"
-				VerticalAlignment="Center"
-				x:Load="{x:Bind ViewModel.ManualEntryBoxLoaded, Mode=OneWay}"
-				BorderBrush="{ThemeResource SystemBaseMediumLowColor}"
-				BorderThickness="{ThemeResource TextControlBorderThemeThickness}"
-				CornerRadius="{StaticResource ControlCornerRadius}"
-				FocusDisengaged="VisiblePath_LostFocus"
-				FontWeight="SemiBold"
-				ItemsSource="{x:Bind ViewModel.NavigationBarSuggestions, Mode=OneWay}"
-				Loaded="VisiblePath_Loaded"
-				LostFocus="VisiblePath_LostFocus"
-				PlaceholderText="{helpers:ResourceString Name=NavigationToolbarVisiblePath/PlaceholderText}"
-				PreviewKeyDown="VisiblePath_KeyDown"
-				QuerySubmitted="VisiblePath_QuerySubmitted"
-				ScrollViewer.HorizontalScrollBarVisibility="Auto"
-				ScrollViewer.VerticalScrollBarVisibility="Hidden"
-				Text="{x:Bind ViewModel.PathText, Mode=OneWay}"
-				TextChanged="{x:Bind ViewModel.VisiblePath_TextChanged, Mode=OneWay}"
-				TextMemberPath="Text"
-				Visibility="{x:Bind converters:MultiBooleanConverter.OrNotConvertToVisibility(ShowSearchBox, ViewModel.IsSearchBoxVisible), Mode=OneWay}">
-				<AutoSuggestBox.ItemTemplate>
-					<DataTemplate x:DataType="items:NavigationBarSuggestionItem">
-						<StackPanel Margin="0,4">
-							<Grid ColumnSpacing="8">
-								<Grid.ColumnDefinitions>
-									<ColumnDefinition Width="*" />
-									<ColumnDefinition Width="Auto" />
-								</Grid.ColumnDefinitions>
-
-								<!--  Primary Title  -->
-								<TextBlock
-									x:Name="PrimaryDisplayBlock"
-									Grid.Column="0"
-									Foreground="{ThemeResource TextFillColorPrimaryBrush}"
-									MaxLines="1"
-									TextTrimming="CharacterEllipsis"
-									TextWrapping="NoWrap">
-									<Run FontWeight="Normal" Text="{x:Bind PrimaryDisplayPreMatched, Mode=OneWay}" /><Run FontWeight="Bold" Text="{x:Bind PrimaryDisplayMatched, Mode=OneWay}" /><Run FontWeight="Normal" Text="{x:Bind PrimaryDisplayPostMatched, Mode=OneWay}" />
-								</TextBlock>
-
-								<!--  Keyboard Shortcuts  -->
-								<keyboard:KeyboardShortcut
-									x:Name="RightAlignedKeyboardShortcut"
-									Grid.Column="1"
-									HotKeys="{x:Bind HotKeys, Mode=OneWay}" />
-							</Grid>
-						</StackPanel>
-					</DataTemplate>
-				</AutoSuggestBox.ItemTemplate>
-			</AutoSuggestBox>
-
-			<!--  Path Breadcrumb Bar  -->
-			<Grid
-				x:Name="ClickablePath"
-				Grid.Column="1"
-				MinHeight="33"
-				HorizontalAlignment="Stretch"
-				VerticalAlignment="Center"
-				x:Load="{x:Bind ViewModel.ClickablePathLoaded, Mode=OneWay}"
-				Background="{ThemeResource TextControlBackground}"
-				BorderBrush="{ThemeResource ControlElevationBorderBrush}"
-				BorderThickness="1"
-				CornerRadius="{StaticResource ControlCornerRadius}"
-				GettingFocus="ClickablePath_GettingFocus"
-				PointerPressed="ManualPathEntryItem_Click"
-				Visibility="{x:Bind converters:MultiBooleanConverter.OrNotConvertToVisibility(ShowSearchBox, ViewModel.IsSearchBoxVisible), Mode=OneWay}">
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="*" />
-					<ColumnDefinition Width="Auto" />
-				</Grid.ColumnDefinitions>
-				<uc:PathBreadcrumb
-					Grid.Column="0"
-					VerticalAlignment="Stretch"
-					HorizontalContentAlignment="Stretch"
-					VerticalContentAlignment="Stretch"
-					ViewModel="{x:Bind ViewModel, Mode=OneWay}" />
-				<FontIcon
-					Grid.Column="1"
-					Margin="12"
-					FontSize="16"
-					Foreground="{ThemeResource App.Theme.IconBaseBrush}"
-					Glyph="&#xE70D;" />
-			</Grid>
-
-			<!--  Storage Search Box  -->
-			<uc:SearchBox
-				x:Name="SearchRegion"
-				Grid.Column="2"
-				Width="240"
-				Height="34"
-				HorizontalAlignment="Stretch"
-				VerticalAlignment="Center"
-				AccessKey="K"
-				AccessKeyInvoked="SearchRegion_AccessKeyInvoked"
-				Canvas.ZIndex="100"
-				CornerRadius="{StaticResource ControlCornerRadius}"
-				GotFocus="SearchRegion_OnGotFocus"
-				LostFocus="SearchRegion_LostFocus"
-				SearchBoxViewModel="{x:Bind ViewModel.SearchBoxViewModel, Mode=OneWay}"
-				Visibility="{x:Bind converters:MultiBooleanConverter.OrConvertToVisibility(ShowSearchBox, ViewModel.IsSearchBoxVisible), Mode=OneWay}" />
-
-			<!--  Right Side Action Buttons  -->
-			<StackPanel
-				Grid.Column="3"
-				Orientation="Horizontal"
-				Spacing="4">
-
-				<!--  Mini Search Button  -->
-				<Button
-					x:Name="ShowSearchButton"
-					AccessKey="I"
-					AccessKeyInvoked="Button_AccessKeyInvoked"
-					AutomationProperties.Name="{x:Bind Commands.Search.Label, Mode=OneWay}"
-					Command="{x:Bind Commands.Search, Mode=OneWay}"
-					IsEnabled="{x:Bind Commands.Search.IsExecutable, Mode=OneWay}"
-					Style="{StaticResource AddressToolbarButtonStyle}"
-					ToolTipService.ToolTip="{x:Bind Commands.Search.LabelWithHotKey, Mode=OneWay}"
-					Visibility="Collapsed">
-					<FontIcon FontSize="14" Glyph="{x:Bind ViewModel.SearchButtonGlyph, Mode=OneTime}" />
-				</Button>
-
-				<!--  Shelf Pane  -->
-				<ToggleButton
-					x:Name="ShelfPaneToggleButton"
-					Width="36"
-					Height="32"
-					Padding="0"
-					x:Load="{x:Bind ViewModel.ShowShelfPaneToggleButton, Mode=OneWay}"
-					AccessKeyInvoked="Button_AccessKeyInvoked"
-					AutomationProperties.Name="{x:Bind Commands.ToggleShelfPane.Label, Mode=OneWay}"
-					Background="Transparent"
-					BorderBrush="Transparent"
-					IsChecked="{x:Bind Commands.ToggleShelfPane.IsOn, Mode=TwoWay}"
-					ToolTipService.ToolTip="{x:Bind Commands.ToggleShelfPane.LabelWithHotKey, Mode=OneWay}">
-					<controls:ThemedIcon
-						Width="16"
-						Height="16"
-						Style="{StaticResource App.ThemedIcons.Shelf}" />
-				</ToggleButton>
-
-				<!--  Status Center  -->
-				<Button
-					x:Name="ShowStatusCenterButton"
-					Padding="0"
-					AccessKey="T"
-					AccessKeyInvoked="Button_AccessKeyInvoked"
-					AutomationProperties.Name="{helpers:ResourceString Name=StatusCenter}"
-					Style="{StaticResource AddressToolbarButtonStyle}"
-					ToolTipService.ToolTip="{helpers:ResourceString Name=StatusCenter}"
-					Visibility="{x:Bind OngoingTasksViewModel.HasAnyItem, Mode=OneWay}">
-
-					<Grid Margin="-16">
-
-						<!-- Enable icon again if we add option to always display on the toolbar
-						<ThemedIcon
-							x:Name="StatusCenterIcon"
-							Width="16"
-							Height="16"
-							x:Load="{x:Bind OngoingTasksViewModel.HasAnyItemInProgress, Converter={StaticResource BoolNegationConverter}, Mode=OneWay}"
-							Style="{StaticResource App.ThemedIcons.StatusCenter}" />-->
-
-						<ProgressRing
-							x:Name="MedianOperationProgressRing"
-							HorizontalAlignment="Center"
-							VerticalAlignment="Center"
-							x:Load="{x:Bind OngoingTasksViewModel.HasAnyItemInProgress, Mode=OneWay}"
-							Background="{ThemeResource SubtleFillColorSecondaryBrush}"
-							IsIndeterminate="False"
-							Value="{x:Bind OngoingTasksViewModel.AverageOperationProgressValue, Mode=OneWay}" />
-
-						<InfoBadge
-							x:Name="StatusInfoBadge"
-							HorizontalAlignment="Center"
-							VerticalAlignment="Center"
-							Value="{x:Bind OngoingTasksViewModel.InfoBadgeValue, Mode=OneWay}" />
-
-					</Grid>
-
-					<Button.Flyout>
-						<Flyout
-							contract8Present:ShouldConstrainToRootBounds="False"
-							AutomationProperties.Name="{helpers:ResourceString Name=StatusCenter}"
-							Placement="BottomEdgeAlignedRight">
-							<Flyout.FlyoutPresenterStyle>
-								<Style TargetType="FlyoutPresenter">
-									<Setter Property="Padding" Value="0" />
-									<Setter Property="CornerRadius" Value="{StaticResource OverlayCornerRadius}" />
-								</Style>
-							</Flyout.FlyoutPresenterStyle>
-
-							<ucs:StatusCenter
-								x:Name="OngoingTasksControl"
-								Width="400"
-								MinHeight="300"
-								MaxHeight="500"
-								x:FieldModifier="public"
-								IsTabStop="True" />
-						</Flyout>
-					</Button.Flyout>
-
-				</Button>
-
-				<!--  Update The Files App Button When An Update Available  -->
-				<Button
-					x:Name="UpdateAppButton"
-					HorizontalContentAlignment="Stretch"
-					VerticalContentAlignment="Stretch"
-					x:Load="{x:Bind ViewModel.IsUpdateAvailable, Mode=OneWay}"
-					AccessKey="1"
-					AccessKeyInvoked="Button_AccessKeyInvoked"
-					AutomationProperties.Name="{helpers:ResourceString Name=UpdateFiles}"
-					Command="{x:Bind ViewModel.UpdateCommand, Mode=OneWay}"
-					IsEnabled="{x:Bind ViewModel.IsUpdating, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"
-					Style="{StaticResource AddressToolbarButtonStyle}"
-					ToolTipService.ToolTip="{helpers:ResourceString Name=UpdateFiles}">
-					<Grid>
-						<!--  Icon  -->
-						<controls:ThemedIcon
-							x:Name="UpdateIcon"
-							Width="16"
-							Height="16"
-							x:Load="{x:Bind ViewModel.IsUpdating, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"
-							IsFilled="True"
-							Style="{StaticResource App.ThemedIcons.AppUpdateAvailable}" />
-
-						<!--  Progress  -->
-						<ProgressRing
-							x:Name="UpdateProgressRing"
-							Width="20"
-							Height="20"
-							x:Load="{x:Bind ViewModel.IsUpdating, Mode=OneWay}"
-							IsIndeterminate="True" />
-					</Grid>
-				</Button>
-
-				<!--  Open the Release Notes dialog  -->
-				<Button
-					x:Name="OpenReleaseNotesButton"
-					HorizontalContentAlignment="Stretch"
-					VerticalContentAlignment="Stretch"
-					x:Load="{x:Bind ViewModel.IsAppUpdated, Mode=OneWay}"
-					AccessKey="2"
-					AccessKeyInvoked="Button_AccessKeyInvoked"
-					AutomationProperties.Name="{x:Bind Commands.OpenReleaseNotes.Label, Mode=OneWay}"
-					Command="{x:Bind Commands.OpenReleaseNotes, Mode=OneWay}"
-					Style="{StaticResource AddressToolbarButtonStyle}"
-					ToolTipService.ToolTip="{x:Bind Commands.OpenReleaseNotes.LabelWithHotKey, Mode=OneWay}"
-					Visibility="{x:Bind Commands.OpenReleaseNotes.IsExecutable, Mode=OneWay}">
-					<controls:ThemedIcon
-						Width="16"
-						Height="16"
-						Style="{StaticResource App.ThemedIcons.AppUpdatedBox}" />
-				</Button>
-			</StackPanel>
-
-			<!--  Status Center TeachingTip  -->
-			<TeachingTip
-				x:Name="StatusCenterTeachingTip"
-				Title="{helpers:ResourceString Name=OngoingTasksTeachingTip/Title}"
-				IsOpen="False"
-				Subtitle="{helpers:ResourceString Name=OngoingTasksTeachingTip/Subtitle}"
-				Target="{x:Bind ShowStatusCenterButton}" />
+			<!--  Modifies the current path  -->
+			<TextBox
+				x:Name="CurrentPathSetTextBox"
+				AutomationProperties.AutomationId="CurrentPathSet"
+				TextChanged="{x:Bind ViewModel.CurrentPathSetTextBox_TextChanged, Mode=OneWay}" />
 		</Grid>
 
-		<VisualStateManager.VisualStateGroups>
-			<VisualStateGroup>
-				<VisualState x:Name="SearchBoxAlwaysShown">
-					<VisualState.StateTriggers>
-						<triggers:IsEqualStateTrigger Value="{x:Bind ShowSearchBox, Mode=OneWay}" To="True" />
-					</VisualState.StateTriggers>
-				</VisualState>
+		<!--  Page Navigation Actions  -->
+		<StackPanel
+			Grid.Column="0"
+			Orientation="Horizontal"
+			Spacing="4">
 
-				<VisualState x:Name="SearchBoxCollapse">
+			<ToggleButton
+				x:Name="SidebarPaneToggleButton"
+				Width="36"
+				Height="32"
+				Padding="0"
+				x:Load="{x:Bind IsSidebarPaneOpenToggleButtonVisible, Mode=OneWay}"
+				AutomationProperties.Name="ToggleSidebarPane"
+				Background="Transparent"
+				BorderBrush="Transparent"
+				IsChecked="{x:Bind MainPageViewModel.IsSidebarPaneOpen, Mode=TwoWay}"
+				ToolTipService.ToolTip="{helpers:ResourceString Name=ToggleSidebar}">
+				<AnimatedIcon Width="14">
+					<AnimatedIcon.Source>
+						<animatedvisuals:AnimatedGlobalNavigationButtonVisualSource />
+					</AnimatedIcon.Source>
+					<AnimatedIcon.FallbackIconSource>
+						<SymbolIconSource Symbol="GlobalNavigationButton" />
+					</AnimatedIcon.FallbackIconSource>
+				</AnimatedIcon>
+			</ToggleButton>
+
+			<Button
+				x:Name="Back"
+				AccessKey="B"
+				AccessKeyInvoked="Button_AccessKeyInvoked"
+				AutomationProperties.FullDescription="{x:Bind Commands.NavigateBack.Description, Mode=OneWay}"
+				AutomationProperties.Name="{x:Bind Commands.NavigateBack.Label, Mode=OneWay}"
+				Command="{x:Bind Commands.NavigateBack, Mode=OneWay}"
+				Style="{StaticResource AddressToolbarButtonStyle}"
+				ToolTipService.ToolTip="{x:Bind Commands.NavigateBack.LabelWithHotKey, Mode=OneWay}">
+				<FontIcon FontSize="14" Glyph="{x:Bind Commands.NavigateBack.Glyph.BaseGlyph, Mode=OneTime}" />
+				<Button.ContextFlyout>
+					<MenuFlyout
+						x:Name="BackHistoryFlyout"
+						AreOpenCloseAnimationsEnabled="False"
+						Opening="BackHistoryFlyout_Opening"
+						Placement="BottomEdgeAlignedLeft"
+						ScrollViewer.VerticalScrollBarVisibility="Auto"
+						ScrollViewer.VerticalScrollMode="Auto">
+						<MenuFlyout.MenuFlyoutPresenterStyle>
+							<Style TargetType="MenuFlyoutPresenter">
+								<Setter Property="MaxHeight" Value="400" />
+								<!--  Workaround for https://github.com/files-community/Files/issues/13078  -->
+								<Setter Target="HighContrastAdjustment" Value="None" />
+							</Style>
+						</MenuFlyout.MenuFlyoutPresenterStyle>
+					</MenuFlyout>
+				</Button.ContextFlyout>
+			</Button>
+
+			<Button
+				x:Name="FlyoutButton"
+				LosingFocus="NavigationButtonOverflowFlyoutButton_LosingFocus"
+				Style="{StaticResource AddressToolbarButtonStyle}"
+				ToolTipService.ToolTip="{helpers:ResourceString Name=SeeMore}"
+				Visibility="Collapsed">
+				<FontIcon FontSize="14" Glyph="&#xE712;" />
+				<Button.Flyout>
+					<MenuFlyout Placement="BottomEdgeAlignedLeft">
+						<MenuFlyoutItem Command="{x:Bind Commands.NavigateForward, Mode=OneWay}" Text="{x:Bind Commands.NavigateForward.Label, Mode=OneWay}">
+							<MenuFlyoutItem.Icon>
+								<FontIcon Glyph="{x:Bind Commands.NavigateForward.Glyph.BaseGlyph, Mode=OneTime}" />
+							</MenuFlyoutItem.Icon>
+						</MenuFlyoutItem>
+						<MenuFlyoutItem Command="{x:Bind Commands.NavigateUp, Mode=OneWay}" Text="{x:Bind Commands.NavigateUp.Label, Mode=OneWay}">
+							<MenuFlyoutItem.Icon>
+								<FontIcon Glyph="{x:Bind Commands.NavigateUp.Glyph.BaseGlyph, Mode=OneTime}" />
+							</MenuFlyoutItem.Icon>
+						</MenuFlyoutItem>
+						<MenuFlyoutItem Command="{x:Bind Commands.RefreshItems, Mode=OneWay}" Text="{x:Bind Commands.RefreshItems.Label, Mode=OneWay}">
+							<MenuFlyoutItem.Icon>
+								<FontIcon Glyph="{x:Bind Commands.RefreshItems.Glyph.BaseGlyph, Mode=OneTime}" />
+							</MenuFlyoutItem.Icon>
+						</MenuFlyoutItem>
+					</MenuFlyout>
+				</Button.Flyout>
+			</Button>
+
+			<Button
+				x:Name="Forward"
+				AccessKey="F"
+				AccessKeyInvoked="Button_AccessKeyInvoked"
+				AutomationProperties.FullDescription="{x:Bind Commands.NavigateForward.Description, Mode=OneWay}"
+				AutomationProperties.Name="{x:Bind Commands.NavigateForward.Label, Mode=OneWay}"
+				Command="{x:Bind Commands.NavigateForward, Mode=OneWay}"
+				Style="{StaticResource AddressToolbarButtonStyle}"
+				ToolTipService.ToolTip="{x:Bind Commands.NavigateForward.LabelWithHotKey, Mode=OneWay}">
+				<FontIcon FontSize="14" Glyph="{x:Bind Commands.NavigateForward.Glyph.BaseGlyph, Mode=OneTime}" />
+				<Button.ContextFlyout>
+					<MenuFlyout
+						x:Name="ForwardHistoryFlyout"
+						AreOpenCloseAnimationsEnabled="False"
+						Opening="ForwardHistoryFlyout_Opening"
+						Placement="BottomEdgeAlignedLeft"
+						ScrollViewer.VerticalScrollBarVisibility="Auto"
+						ScrollViewer.VerticalScrollMode="Auto">
+						<MenuFlyout.MenuFlyoutPresenterStyle>
+							<Style TargetType="MenuFlyoutPresenter">
+								<Setter Property="MaxHeight" Value="400" />
+								<!--  Workaround for https://github.com/files-community/Files/issues/13078  -->
+								<Setter Target="HighContrastAdjustment" Value="None" />
+							</Style>
+						</MenuFlyout.MenuFlyoutPresenterStyle>
+					</MenuFlyout>
+				</Button.ContextFlyout>
+			</Button>
+
+			<Button
+				x:Name="Up"
+				AccessKey="U"
+				AccessKeyInvoked="Button_AccessKeyInvoked"
+				AutomationProperties.FullDescription="{x:Bind Commands.NavigateUp.Description, Mode=OneWay}"
+				AutomationProperties.Name="{x:Bind Commands.NavigateUp.Label, Mode=OneWay}"
+				Command="{x:Bind Commands.NavigateUp, Mode=OneWay}"
+				Style="{StaticResource AddressToolbarButtonStyle}"
+				ToolTipService.ToolTip="{x:Bind Commands.NavigateUp.LabelWithHotKey, Mode=OneWay}">
+				<FontIcon FontSize="14" Glyph="{x:Bind Commands.NavigateUp.Glyph.BaseGlyph, Mode=OneTime}" />
+			</Button>
+
+			<Button
+				x:Name="Refresh"
+				AccessKey="R"
+				AccessKeyInvoked="Button_AccessKeyInvoked"
+				AutomationProperties.Name="{x:Bind Commands.RefreshItems.Label, Mode=OneWay}"
+				Command="{x:Bind Commands.RefreshItems, Mode=OneWay}"
+				Style="{StaticResource AddressToolbarButtonStyle}"
+				ToolTipService.ToolTip="{x:Bind Commands.RefreshItems.LabelWithHotKey, Mode=OneWay}">
+				<FontIcon FontSize="14" Glyph="{x:Bind Commands.RefreshItems.Glyph.BaseGlyph, Mode=OneTime}" />
+			</Button>
+		</StackPanel>
+
+		<!--  Omnibar  -->
+		<controls:Omnibar
+			x:Name="Omnibar"
+			Grid.Column="1"
+			x:Load="{x:Bind ViewModel.LoadOmnibar, Mode=OneWay}"
+			CurrentSelectedModeName="{x:Bind ViewModel.OmnibarCurrentSelectedModeName, Mode=TwoWay}"
+			IsFocusedChanged="Omnibar_IsFocusedChanged"
+			ModeChanged="Omnibar_ModeChanged"
+			PreviewKeyDown="Omnibar_PreviewKeyDown"
+			QuerySubmitted="Omnibar_QuerySubmitted"
+			TextChanged="Omnibar_TextChanged">
+
+			<controls:OmnibarMode
+				x:Name="OmnibarPathMode"
+				IconOnActive="{controls:ThemedIconMarkup Style={StaticResource App.ThemedIcons.Omnibar.Path}, IsFilled=True}"
+				IconOnInactive="{controls:ThemedIconMarkup Style={StaticResource App.ThemedIcons.Omnibar.Path}, IconType=Outline}"
+				IsDefault="True"
+				ItemsSource="{x:Bind ViewModel.PathModeSuggestionItems, Mode=OneWay}"
+				ModeName="{x:Bind Commands.EditPath.LabelWithHotKey, Mode=OneWay}"
+				PlaceholderText="{helpers:ResourceString Name=OmnibarPathModeTextPlaceholder}"
+				Text="{x:Bind ViewModel.PathText, Mode=TwoWay}"
+				TextMemberPath="Path">
+				<controls:OmnibarMode.ContentOnInactive>
+					<controls:BreadcrumbBar
+						x:Name="BreadcrumbBar"
+						EllipsisButtonToolTip="{helpers:ResourceString Name=BreadcrumbBarEllipsisButtonToolTip}"
+						ItemClicked="BreadcrumbBar_ItemClicked"
+						ItemDropDownFlyoutClosed="BreadcrumbBar_ItemDropDownFlyoutClosed"
+						ItemDropDownFlyoutOpening="BreadcrumbBar_ItemDropDownFlyoutOpening"
+						ItemsSource="{x:Bind ViewModel.PathComponents, Mode=OneWay}"
+						RootItemChevronToolTip="{helpers:ResourceString Name=BreadcrumbBarRootChevronButtonToolTip}"
+						RootItemToolTip="{helpers:ResourceString Name=Home}">
+						<controls:BreadcrumbBar.RootItem>
+							<Image
+								Width="16"
+								Height="16"
+								Source="/Assets/FluentIcons/Home.png" />
+						</controls:BreadcrumbBar.RootItem>
+						<controls:BreadcrumbBar.ItemTemplate>
+							<DataTemplate x:DataType="dataitems:PathBoxItem">
+								<controls:BreadcrumbBarItem
+									AllowDrop="True"
+									AutomationProperties.AccessibilityView="Content"
+									AutomationProperties.Name="{x:Bind Title, Mode=OneWay}"
+									ChevronToolTip="{x:Bind ChevronToolTip, Mode=OneWay}"
+									Content="{x:Bind Title, Mode=OneWay}"
+									DataContext="{x:Bind}"
+									DragLeave="BreadcrumbBarItem_DragLeave"
+									DragOver="BreadcrumbBarItem_DragOver"
+									Drop="BreadcrumbBarItem_Drop" />
+							</DataTemplate>
+						</controls:BreadcrumbBar.ItemTemplate>
+					</controls:BreadcrumbBar>
+				</controls:OmnibarMode.ContentOnInactive>
+				<controls:OmnibarMode.ItemTemplate>
+					<DataTemplate x:DataType="datamodels:OmnibarPathModeSuggestionModel">
+						<TextBlock Text="{x:Bind DisplayName, Mode=OneWay}" />
+					</DataTemplate>
+				</controls:OmnibarMode.ItemTemplate>
+			</controls:OmnibarMode>
+
+			<controls:OmnibarMode
+				x:Name="OmnibarCommandPaletteMode"
+				IconOnActive="{controls:ThemedIconMarkup Style={StaticResource App.ThemedIcons.Omnibar.Commands}, IsFilled=True}"
+				IconOnInactive="{controls:ThemedIconMarkup Style={StaticResource App.ThemedIcons.Omnibar.Commands}, IconType=Outline}"
+				IsAutoFocusEnabled="True"
+				ItemsSource="{x:Bind ViewModel.OmnibarCommandPaletteModeSuggestionItems, Mode=OneWay}"
+				ModeName="{x:Bind Commands.OpenCommandPalette.LabelWithHotKey, Mode=OneWay}"
+				PlaceholderText="{helpers:ResourceString Name=OmnibarCommandPaletteModeTextPlaceholder}"
+				Text="{x:Bind ViewModel.OmnibarCommandPaletteModeText, Mode=TwoWay}"
+				TextMemberPath="Text"
+				UpdateTextOnSelect="False">
+				<controls:OmnibarMode.ItemTemplate>
+					<DataTemplate x:DataType="dataitems:NavigationBarSuggestionItem">
+						<Grid Padding="0,0,4,0" ColumnSpacing="12">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto" />
+								<ColumnDefinition Width="*" />
+								<ColumnDefinition Width="Auto" />
+							</Grid.ColumnDefinitions>
+
+							<Grid
+								Grid.Column="0"
+								Width="16"
+								Height="16">
+								<Viewbox
+									Width="16"
+									Height="16"
+									Visibility="{x:Bind Glyph, Converter={StaticResource NullToVisibilityCollapsedConverter}, Mode=OneWay}">
+									<FontIcon Foreground="{ThemeResource App.Theme.IconBaseBrush}" Glyph="{x:Bind Glyph, Mode=OneWay}" />
+								</Viewbox>
+								<controls:ThemedIcon Style="{x:Bind ThemedIconStyle, Mode=OneWay}" Visibility="{x:Bind ThemedIconStyle, Converter={StaticResource NullToVisibilityCollapsedConverter}, Mode=OneWay}" />
+								<Image Source="{x:Bind ActionIconSource, Mode=OneWay}" />
+							</Grid>
+
+							<!--  Primary Title  -->
+							<TextBlock
+								x:Name="PrimaryDisplayBlock"
+								Grid.Column="1"
+								VerticalAlignment="Center"
+								Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+								TextTrimming="CharacterEllipsis"
+								TextWrapping="NoWrap">
+								<Run FontWeight="Normal" Text="{x:Bind PrimaryDisplayPreMatched, Mode=OneWay}" /><Run FontWeight="Bold" Text="{x:Bind PrimaryDisplayMatched, Mode=OneWay}" /><Run FontWeight="Normal" Text="{x:Bind PrimaryDisplayPostMatched, Mode=OneWay}" />
+							</TextBlock>
+
+							<!--  Keyboard Shortcuts  -->
+							<keyboard:KeyboardShortcut
+								x:Name="RightAlignedKeyboardShortcut"
+								Grid.Column="2"
+								VerticalAlignment="Center"
+								HotKeys="{x:Bind HotKeys, Mode=OneWay}" />
+						</Grid>
+					</DataTemplate>
+				</controls:OmnibarMode.ItemTemplate>
+			</controls:OmnibarMode>
+
+			<controls:OmnibarMode
+				x:Name="OmnibarSearchMode"
+				IconOnActive="{controls:ThemedIconMarkup Style={StaticResource App.ThemedIcons.Omnibar.Search}, IsFilled=True}"
+				IconOnInactive="{controls:ThemedIconMarkup Style={StaticResource App.ThemedIcons.Omnibar.Search}, IconType=Outline}"
+				IsAutoFocusEnabled="True"
+				ItemsSource="{x:Bind ViewModel.OmnibarSearchModeSuggestionItems, Mode=OneWay}"
+				ModeName="{x:Bind Commands.Search.LabelWithHotKey, Mode=OneWay}"
+				PlaceholderText="{helpers:ResourceString Name=OmnibarSearchModeTextPlaceholder}"
+				Text="{x:Bind ViewModel.OmnibarSearchModeText, Mode=TwoWay}"
+				UpdateTextOnSelect="False">
+				<controls:OmnibarMode.ItemTemplate>
+					<DataTemplate x:DataType="datamodels:SuggestionModel">
+						<Grid ColumnSpacing="8" Tag="{x:Bind ItemPath}">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto" />
+								<ColumnDefinition Width="*" />
+							</Grid.ColumnDefinitions>
+							<Grid
+								Grid.Column="0"
+								Width="16"
+								Height="16"
+								Tag="ItemImage">
+								<Border x:Name="IconArea" x:Load="{x:Bind LoadFileIcon, Mode=OneWay}">
+									<Image
+										Width="16"
+										Height="16"
+										Source="{x:Bind FileImage, Mode=OneWay}"
+										Stretch="Uniform" />
+								</Border>
+								<FontIcon
+									x:Name="EmptyIconGlyph"
+									x:Load="{x:Bind NeedsPlaceholderGlyph, Mode=OneWay}"
+									FontSize="14"
+									Glyph="{x:Bind IsRecentSearch, Mode=OneTime, Converter={StaticResource SearchSuggestionGlyphConverter}}" />
+							</Grid>
+							<TextBlock
+								Grid.Column="1"
+								VerticalAlignment="Center"
+								Text="{x:Bind Name}" />
+						</Grid>
+					</DataTemplate>
+				</controls:OmnibarMode.ItemTemplate>
+			</controls:OmnibarMode>
+
+		</controls:Omnibar>
+
+		<!--  Right Side Action Buttons  -->
+		<StackPanel
+			x:Name="RightSideActionsStackPanel"
+			Grid.Column="2"
+			Orientation="Horizontal"
+			Spacing="4">
+
+			<!--  Shelf Pane  -->
+			<ToggleButton
+				x:Name="ShelfPaneToggleButton"
+				Width="36"
+				Height="32"
+				Padding="0"
+				x:Load="{x:Bind ViewModel.ShowShelfPaneToggleButton, Mode=OneWay}"
+				AccessKeyInvoked="Button_AccessKeyInvoked"
+				AutomationProperties.Name="{x:Bind Commands.ToggleShelfPane.Label, Mode=OneWay}"
+				Background="Transparent"
+				BorderBrush="Transparent"
+				IsChecked="{x:Bind Commands.ToggleShelfPane.IsOn, Mode=TwoWay}"
+				ToolTipService.ToolTip="{x:Bind Commands.ToggleShelfPane.LabelWithHotKey, Mode=OneWay}">
+				<controls:ThemedIcon
+					Width="16"
+					Height="16"
+					Style="{StaticResource App.ThemedIcons.Shelf}" />
+			</ToggleButton>
+
+			<!--  Status Center  -->
+			<Button
+				x:Name="ShowStatusCenterButton"
+				Padding="0"
+				AccessKey="T"
+				AccessKeyInvoked="Button_AccessKeyInvoked"
+				AutomationProperties.Name="{helpers:ResourceString Name=StatusCenter}"
+				Style="{StaticResource AddressToolbarButtonStyle}"
+				ToolTipService.ToolTip="{helpers:ResourceString Name=StatusCenter}"
+				Visibility="{x:Bind ViewModel.ShowStatusCenterButton, Mode=OneWay}">
+
+				<Grid Margin="-16">
+					<controls:ThemedIcon
+						x:Name="StatusCenterIcon"
+						Width="16"
+						Height="16"
+						Style="{StaticResource App.ThemedIcons.StatusCenter}"
+						Visibility="{x:Bind OngoingTasksViewModel.ShowProgressRing, Converter={StaticResource VisibilityInvertConverter}, Mode=OneWay}" />
+
+					<ProgressRing
+						x:Name="MedianOperationProgressRing"
+						HorizontalAlignment="Center"
+						VerticalAlignment="Center"
+						AutomationProperties.Name="{helpers:ResourceString Name=StatusCenterProgressRing}"
+						IsIndeterminate="False"
+						Visibility="{x:Bind OngoingTasksViewModel.ShowProgressRing, Mode=OneWay}"
+						Value="{x:Bind OngoingTasksViewModel.AverageOperationProgressValue, Mode=OneWay}" />
+
+					<InfoBadge
+						x:Name="StatusInfoBadge"
+						HorizontalAlignment="Center"
+						VerticalAlignment="Center"
+						Visibility="{x:Bind OngoingTasksViewModel.ShowProgressRing, Mode=OneWay}"
+						Value="{x:Bind OngoingTasksViewModel.InfoBadgeValue, Mode=OneWay}" />
+				</Grid>
+
+				<Button.Flyout>
+					<Flyout
+						contract8Present:ShouldConstrainToRootBounds="False"
+						AutomationProperties.Name="{helpers:ResourceString Name=StatusCenter}"
+						Opened="{x:Bind OngoingTasksViewModel.OnStatusCenterFlyoutOpened, Mode=OneWay}"
+						Placement="BottomEdgeAlignedRight">
+						<Flyout.FlyoutPresenterStyle>
+							<Style TargetType="FlyoutPresenter">
+								<Setter Property="Padding" Value="0" />
+								<Setter Property="CornerRadius" Value="{StaticResource OverlayCornerRadius}" />
+							</Style>
+						</Flyout.FlyoutPresenterStyle>
+
+						<ucs:StatusCenter
+							x:Name="OngoingTasksControl"
+							Width="400"
+							MinHeight="120"
+							MaxHeight="500"
+							x:FieldModifier="public"
+							IsTabStop="True" />
+					</Flyout>
+				</Button.Flyout>
+
+			</Button>
+
+			<!--  Update The Files App Button When An Update Available  -->
+			<Button
+				x:Name="UpdateAppButton"
+				HorizontalContentAlignment="Stretch"
+				VerticalContentAlignment="Stretch"
+				x:Load="{x:Bind ViewModel.IsUpdateAvailable, Mode=OneWay}"
+				AccessKey="1"
+				AccessKeyInvoked="Button_AccessKeyInvoked"
+				AutomationProperties.Name="{helpers:ResourceString Name=UpdateFiles}"
+				Command="{x:Bind ViewModel.UpdateCommand, Mode=OneWay}"
+				IsEnabled="{x:Bind ViewModel.IsUpdating, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"
+				Style="{StaticResource AddressToolbarButtonStyle}"
+				ToolTipService.ToolTip="{helpers:ResourceString Name=UpdateFiles}">
+				<Grid>
+					<!--  Icon  -->
+					<controls:ThemedIcon
+						x:Name="UpdateIcon"
+						Width="16"
+						Height="16"
+						x:Load="{x:Bind ViewModel.IsUpdating, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"
+						IsFilled="True"
+						Style="{StaticResource App.ThemedIcons.v4.AppUpdateAvailable}" />
+
+					<!--  Progress  -->
+					<ProgressRing
+						x:Name="UpdateProgressRing"
+						Width="20"
+						Height="20"
+						x:Load="{x:Bind ViewModel.IsUpdating, Mode=OneWay}"
+						IsIndeterminate="True" />
+				</Grid>
+			</Button>
+		</StackPanel>
+
+		<!--  Status Center TeachingTip  -->
+		<TeachingTip
+			x:Name="StatusCenterTeachingTip"
+			Title="{helpers:ResourceString Name=OngoingTasksTeachingTip/Title}"
+			IsOpen="False"
+			Subtitle="{helpers:ResourceString Name=OngoingTasksTeachingTip/Subtitle}"
+			Target="{x:Bind ShowStatusCenterButton}" />
+
+		<VisualStateManager.VisualStateGroups>
+			<VisualStateGroup x:Name="NavigationStates">
+				<VisualState x:Name="Narrow">
 					<VisualState.StateTriggers>
-						<triggers:IsEqualStateTrigger Value="{x:Bind ShowSearchBox, Mode=OneWay}" To="False" />
+						<AdaptiveTrigger MinWindowWidth="0" />
 					</VisualState.StateTriggers>
 					<VisualState.Setters>
-						<Setter Target="ShowSearchButton.Visibility" Value="Visible" />
-						<Setter Target="SearchRegion.(Grid.Column)" Value="1" />
-						<Setter Target="SearchRegion.Width" Value="NaN" />
+						<Setter Target="FlyoutButton.Visibility" Value="Visible" />
+						<Setter Target="Forward.Visibility" Value="Collapsed" />
+						<Setter Target="Up.Visibility" Value="Collapsed" />
+						<Setter Target="Refresh.Visibility" Value="Collapsed" />
+					</VisualState.Setters>
+				</VisualState>
+				<VisualState x:Name="Wide">
+					<VisualState.StateTriggers>
+						<AdaptiveTrigger MinWindowWidth="540" />
+					</VisualState.StateTriggers>
+					<VisualState.Setters>
+						<Setter Target="FlyoutButton.Visibility" Value="Collapsed" />
+						<Setter Target="Forward.Visibility" Value="Visible" />
+						<Setter Target="Up.Visibility" Value="Visible" />
+						<Setter Target="Refresh.Visibility" Value="Visible" />
 					</VisualState.Setters>
 				</VisualState>
 			</VisualStateGroup>
-			<VisualStateGroup>
+
+			<VisualStateGroup x:Name="RightActionsGroup">
+				<VisualState>
+					<VisualState.Setters>
+						<Setter Target="RightSideActionsStackPanel.Margin" Value="0" />
+					</VisualState.Setters>
+				</VisualState>
+				<VisualState x:Name="StatusButtonVisible">
+					<VisualState.StateTriggers>
+						<triggers:IsEqualStateTrigger Value="{x:Bind ViewModel.ShowStatusCenterButton, Mode=OneWay}" To="True" />
+					</VisualState.StateTriggers>
+					<VisualState.Setters>
+						<Setter Target="RightSideActionsStackPanel.Margin" Value="0,0,4,0" />
+					</VisualState.Setters>
+				</VisualState>
+				<VisualState x:Name="ShelfButtonVisible">
+					<VisualState.StateTriggers>
+						<triggers:IsEqualStateTrigger Value="{x:Bind ViewModel.ShowShelfPaneToggleButton, Mode=OneWay}" To="True" />
+					</VisualState.StateTriggers>
+					<VisualState.Setters>
+						<Setter Target="RightSideActionsStackPanel.Margin" Value="0,0,4,0" />
+					</VisualState.Setters>
+				</VisualState>
+				<VisualState x:Name="UpdateButtonVisible">
+					<VisualState.StateTriggers>
+						<triggers:IsEqualStateTrigger Value="{x:Bind ViewModel.IsUpdateAvailable, Mode=OneWay}" To="True" />
+					</VisualState.StateTriggers>
+					<VisualState.Setters>
+						<Setter Target="RightSideActionsStackPanel.Margin" Value="0,0,4,0" />
+					</VisualState.Setters>
+				</VisualState>
+			</VisualStateGroup>
+
+			<VisualStateGroup x:Name="StatusIconStates">
 				<VisualState x:Name="TasksSuccess">
 					<VisualState.StateTriggers>
 						<triggers:CompareStateTrigger
@@ -658,6 +580,7 @@
 							To="0" />
 					</VisualState.StateTriggers>
 					<VisualState.Setters>
+						<Setter Target="MedianOperationProgressRing.Background" Value="{ThemeResource SystemFillColorSuccessBrush}" />
 						<Setter Target="StatusInfoBadge.Style" Value="{StaticResource SuccessIconInfoBadgeStyle}" />
 					</VisualState.Setters>
 				</VisualState>
@@ -669,7 +592,9 @@
 							To="1" />
 					</VisualState.StateTriggers>
 					<VisualState.Setters>
-						<Setter Target="StatusInfoBadge.Style" Value="{StaticResource AttentionValueInfoBadgeStyle}" />
+						<Setter Target="MedianOperationProgressRing.Foreground" Value="{ThemeResource SystemFillColorAttentionBrush}" />
+						<Setter Target="MedianOperationProgressRing.Background" Value="{ThemeResource SubtleFillColorSecondaryBrush}" />
+						<Setter Target="StatusCenterIcon.Visibility" Value="Collapsed" />
 					</VisualState.Setters>
 				</VisualState>
 				<VisualState x:Name="TasksFailure">
@@ -680,7 +605,9 @@
 							To="2" />
 					</VisualState.StateTriggers>
 					<VisualState.Setters>
-						<Setter Target="StatusInfoBadge.Style" Value="{StaticResource CriticalValueInfoBadgeStyle}" />
+						<Setter Target="MedianOperationProgressRing.Foreground" Value="{ThemeResource SystemFillColorAttentionBrush}" />
+						<Setter Target="MedianOperationProgressRing.Background" Value="{ThemeResource SubtleFillColorSecondaryBrush}" />
+						<Setter Target="StatusCenterIcon.Visibility" Value="Collapsed" />
 					</VisualState.Setters>
 				</VisualState>
 				<VisualState x:Name="TasksCompletionWithFailure">
@@ -691,6 +618,8 @@
 							To="3" />
 					</VisualState.StateTriggers>
 					<VisualState.Setters>
+						<Setter Target="MedianOperationProgressRing.Background" Value="{ThemeResource SystemFillColorCriticalBrush}" />
+						<Setter Target="StatusCenterIcon.Visibility" Value="Collapsed" />
 						<Setter Target="StatusInfoBadge.Style" Value="{StaticResource CriticalIconInfoBadgeStyle}" />
 					</VisualState.Setters>
 				</VisualState>

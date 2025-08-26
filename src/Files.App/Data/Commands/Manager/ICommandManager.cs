@@ -32,6 +32,8 @@ namespace Files.App.Data.Commands
 		IRichCommand ToggleInfoPane { get; }
 		IRichCommand ToggleToolbar { get; }
 		IRichCommand ToggleShelfPane { get; }
+		IRichCommand ToggleFilterHeader { get; }
+		IRichCommand ToggleDualPane { get; }
 
 		IRichCommand CopyItem { get; }
 		IRichCommand CopyItemPath { get; }
@@ -110,18 +112,21 @@ namespace Files.App.Data.Commands
 		IRichCommand OpenStorageSenseFromHome { get; }
 		IRichCommand OpenStorageSenseFromSidebar { get; }
 		IRichCommand OpenSettings { get; }
+		IRichCommand OpenSettingsFile { get; }
 		IRichCommand OpenTerminal { get; }
 		IRichCommand OpenTerminalAsAdmin { get; }
 		IRichCommand OpenTerminalFromSidebar { get; }
 		IRichCommand OpenTerminalFromHome { get; }
 		IRichCommand OpenCommandPalette { get; }
 		IRichCommand EditInNotepad { get; }
+		IRichCommand OpenLogFile { get; }
+		IRichCommand OpenLogFileLocation { get; }
 
 		IRichCommand LayoutDecreaseSize { get; }
 		IRichCommand LayoutIncreaseSize { get; }
 		IRichCommand LayoutDetails { get; }
 		IRichCommand LayoutList { get; }
-		IRichCommand LayoutCards{ get; }
+		IRichCommand LayoutCards { get; }
 		IRichCommand LayoutGrid { get; }
 		IRichCommand LayoutColumns { get; }
 		IRichCommand LayoutAdaptive { get; }
@@ -193,8 +198,8 @@ namespace Files.App.Data.Commands
 
 		IRichCommand CloseActivePane { get; }
 		IRichCommand FocusOtherPane { get; }
-		IRichCommand AddVerticalPane { get; }
-		IRichCommand AddHorizontalPane { get; }
+		IRichCommand SplitPaneVertically { get; }
+		IRichCommand SplitPaneHorizontally { get; }
 		IRichCommand ArrangePanesVertically { get; }
 		IRichCommand ArrangePanesHorizontally { get; }
 

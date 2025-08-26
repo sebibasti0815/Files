@@ -66,6 +66,11 @@ namespace Files.App.Data.Contracts
 		/// </summary>
 		public void NavigateHome();
 
+		/// <summary>
+		/// Navigates to the release notes page
+		/// </summary>
+		public void NavigateToReleaseNotes();
+
 		void NavigateWithArguments(Type sourcePageType, NavigationArguments navArgs);
 
 		void RemoveLastPageFromBackStack();

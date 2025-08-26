@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Files Community
 // Licensed under the MIT License.
 
-using Files.App.UserControls.Widgets;
 using Microsoft.UI.Xaml.Controls;
 using System.Collections.Immutable;
 
@@ -12,6 +11,8 @@ namespace Files.App.Data.Contexts
 		private static readonly ImmutableList<WidgetFileTagCardItem> emptyTaggedItems = Enumerable.Empty<WidgetFileTagCardItem>().ToImmutableList();
 
 		public bool IsAnyItemRightClicked => rightClickedItem is not null;
+
+		public IHomeFolder HomeFolder { get; } = new HomeFolder();
 
 		private WidgetCardItem? rightClickedItem = null;
 		public WidgetCardItem? RightClickedItem => rightClickedItem;

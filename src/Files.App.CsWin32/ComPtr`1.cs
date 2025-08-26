@@ -3,7 +3,6 @@
 
 using System;
 using System.Runtime.CompilerServices;
-using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.System.Com;
 
@@ -16,8 +15,13 @@ namespace Windows.Win32
 	{
 		private T* _ptr;
 
-		public bool IsNull
-			=> _ptr == null;
+		public readonly bool IsNull
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => _ptr is null;
+		}
+
+		// Constructors
 
 		public ComPtr(T* ptr)
 		{
@@ -27,12 +31,23 @@ namespace Windows.Win32
 				((IUnknown*)ptr)->AddRef();
 		}
 
+		// Methods
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Attach(T* other)
 		{
 			if (_ptr is not null)
 				((IUnknown*)_ptr)->Release();
 
 			_ptr = other;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public T* Detach()
+		{
+			T* ptr = _ptr;
+			_ptr = null;
+			return ptr;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -48,19 +63,24 @@ namespace Windows.Win32
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public readonly ComPtr<U> As<U>() where U : unmanaged, IComIID
+		public readonly HRESULT As<U>(U** other) where U : unmanaged, IComIID
 		{
-			ComPtr<U> ptr = default;
-			((IUnknown*)_ptr)->QueryInterface((Guid*)Unsafe.AsPointer(ref Unsafe.AsRef(in U.Guid)), (void**)ptr.GetAddressOf());
-			return ptr;
+			return ((IUnknown*)_ptr)->QueryInterface((Guid*)Unsafe.AsPointer(ref Unsafe.AsRef(in U.Guid)), (void**)other);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public readonly HRESULT CoCreateInstance<U>(CLSCTX dwClsContext = CLSCTX.CLSCTX_LOCAL_SERVER)
+		public readonly HRESULT As<U>(Guid* riid, IUnknown** other) where U : unmanaged, IComIID
 		{
-			Guid iid = typeof(T).GUID, clsid = typeof(U).GUID;
-			return PInvoke.CoCreateInstance(&clsid, null, dwClsContext, &iid, (void**)this.GetAddressOf());
+			return ((IUnknown*)_ptr)->QueryInterface(riid, (void**)other);
 		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public readonly HRESULT CoCreateInstance(Guid* rclsid, IUnknown* pUnkOuter = null, CLSCTX dwClsContext = CLSCTX.CLSCTX_LOCAL_SERVER)
+		{
+			return PInvoke.CoCreateInstance(rclsid, pUnkOuter, dwClsContext, (Guid*)Unsafe.AsPointer(ref Unsafe.AsRef(in T.Guid)), (void**)this.GetAddressOf());
+		}
+
+		// Disposer
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Dispose()

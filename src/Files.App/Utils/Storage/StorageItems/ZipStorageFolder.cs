@@ -47,10 +47,7 @@ namespace Files.App.Utils.Storage
 			=> DateCreated = entry.CreationTime == DateTime.MinValue ? DateTimeOffset.MinValue : entry.CreationTime;
 		public ZipStorageFolder(BaseStorageFile backingFile)
 		{
-			if (string.IsNullOrEmpty(backingFile.Path))
-			{
-				throw new ArgumentException("Backing file Path cannot be null");
-			}
+			ArgumentException.ThrowIfNullOrEmpty(backingFile.Path);
 			Name = IO.Path.GetFileName(backingFile.Path.TrimEnd('\\', '/'));
 			Path = backingFile.Path;
 			this.containerPath = backingFile.Path;
@@ -315,6 +312,7 @@ namespace Files.App.Utils.Storage
 					await using (var archiveStream = await OpenZipFileAsync(FileAccessMode.Read))
 					{
 						SevenZipCompressor compressor = new SevenZipCompressor() { CompressionMode = CompressionMode.Append };
+						compressor.CustomParameters.Add("cu", "on");
 						compressor.SetFormatFromExistingArchive(archiveStream);
 						var fileName = IO.Path.GetRelativePath(containerPath, zipDesiredName);
 						await compressor.CompressStreamDictionaryAsync(archiveStream, new Dictionary<string, Stream>() { { fileName, null } }, Credentials.Password, ms);
@@ -366,6 +364,7 @@ namespace Files.App.Utils.Storage
 						await using (var archiveStream = await OpenZipFileAsync(FileAccessMode.Read))
 						{
 							SevenZipCompressor compressor = new SevenZipCompressor() { CompressionMode = CompressionMode.Append };
+							compressor.CustomParameters.Add("cu", "on");
 							compressor.SetFormatFromExistingArchive(archiveStream);
 							var folderKey = IO.Path.GetRelativePath(containerPath, Path);
 							var folderDes = IO.Path.Combine(IO.Path.GetDirectoryName(folderKey), desiredName);
@@ -417,6 +416,7 @@ namespace Files.App.Utils.Storage
 						await using (var archiveStream = await OpenZipFileAsync(FileAccessMode.Read))
 						{
 							SevenZipCompressor compressor = new SevenZipCompressor() { CompressionMode = CompressionMode.Append };
+							compressor.CustomParameters.Add("cu", "on");
 							compressor.SetFormatFromExistingArchive(archiveStream);
 							var entriesMap = new Dictionary<int, string>(index.Select(x => new KeyValuePair<int, string>(x.Index, null)));
 							await compressor.ModifyArchiveAsync(archiveStream, entriesMap, Credentials.Password, ms);
@@ -556,6 +556,7 @@ namespace Files.App.Utils.Storage
 				CompressionMode = CompressionMode.Create,
 				ArchiveFormat = format
 			};
+			compressor.CustomParameters.Add("cu", "on");
 			await compressor.CompressStreamDictionaryAsync(stream, new Dictionary<string, Stream>());
 			await stream.FlushAsync();
 			return true;
@@ -627,6 +628,7 @@ namespace Files.App.Utils.Storage
 					await using (var archiveStream = await OpenZipFileAsync(FileAccessMode.Read))
 					{
 						SevenZipCompressor compressor = new SevenZipCompressor() { CompressionMode = CompressionMode.Append };
+						compressor.CustomParameters.Add("cu", "on");
 						compressor.SetFormatFromExistingArchive(archiveStream);
 						var fileName = IO.Path.GetRelativePath(containerPath, zipDesiredName);
 						await compressor.CompressStreamDictionaryAsync(archiveStream, new Dictionary<string, Stream>() { { fileName, contents } }, Credentials.Password, ms);

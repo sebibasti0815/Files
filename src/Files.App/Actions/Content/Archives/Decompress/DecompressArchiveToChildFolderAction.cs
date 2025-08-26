@@ -15,7 +15,7 @@ namespace Files.App.Actions
 			=> ComputeLabel();
 
 		public override string Description
-			=> Strings.DecompressArchiveToChildFolderDescription.GetLocalizedResource();
+			=> Strings.DecompressArchiveToChildFolderDescription.GetLocalizedFormatResource(context.SelectedItems.Count);
 
 		public DecompressArchiveToChildFolderAction()
 		{
@@ -71,6 +71,7 @@ namespace Files.App.Actions
 			switch (e.PropertyName)
 			{
 				case nameof(IContentPageContext.SelectedItems):
+				case nameof(IContentPageContext.Folder):
 					{
 						if (IsContextPageTypeAdaptedToCommand())
 						{

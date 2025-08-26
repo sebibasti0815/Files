@@ -47,7 +47,9 @@ namespace Files.App.Controls
 				VisualStateManager.GoToState(this, "ChevronCollapsed", true);
 
 			_itemContentButton.Click += ItemContentButton_Click;
+			_itemContentButton.PreviewKeyDown += ItemContentButton_PreviewKeyDown;
 			_itemChevronButton.Click += ItemChevronButton_Click;
+			_itemChevronButton.PreviewKeyDown += ItemChevronButton_PreviewKeyDown;
 			_itemChevronDropDownMenuFlyout.Opening += ChevronDropDownMenuFlyout_Opening;
 			_itemChevronDropDownMenuFlyout.Opened += ChevronDropDownMenuFlyout_Opened;
 			_itemChevronDropDownMenuFlyout.Closed += ChevronDropDownMenuFlyout_Closed;
@@ -55,31 +57,33 @@ namespace Files.App.Controls
 
 		public void OnItemClicked()
 		{
-			if (_ownerRef is not null &&
-				_ownerRef.TryGetTarget(out var breadcrumbBar))
+			if (_ownerRef is null ||
+				!_ownerRef.TryGetTarget(out var breadcrumbBar))
+				return;
+
+			if (IsEllipsis)
 			{
-				if (IsEllipsis)
-				{
-					// Clear items in the ellipsis flyout
-					_itemEllipsisDropDownMenuFlyout.Items.Clear();
+				// Clear items in the ellipsis flyout
+				_itemEllipsisDropDownMenuFlyout.Items.Clear();
 
-					// Populate items in the ellipsis flyout
-					for (int index = 0; index < breadcrumbBar.IndexAfterEllipsis; index++)
+				// Populate items in the ellipsis flyout
+				for (int index = 0; index < breadcrumbBar.IndexAfterEllipsis; index++)
+				{
+					if (breadcrumbBar.TryGetElement(index, out var item) && item?.Content is string text)
 					{
-						if (breadcrumbBar.TryGetElement(index, out var item) && item?.Content is string text)
-						{
-							_itemEllipsisDropDownMenuFlyout.Items.Add(new MenuFlyoutItem() { Text = text });
-						}
+						var menuFlyoutItem = new MenuFlyoutItem() { Text = text };
+						_itemEllipsisDropDownMenuFlyout.Items.Add(menuFlyoutItem);
+						menuFlyoutItem.Click += (sender, e) => breadcrumbBar.RaiseItemClickedEvent(item);
 					}
+				}
 
-					// Open the ellipsis flyout
-					FlyoutBase.ShowAttachedFlyout(_itemContentButton);
-				}
-				else
-				{
-					// Fire a click event
-					breadcrumbBar.RaiseItemClickedEvent(this);
-				}
+				// Open the ellipsis flyout
+				FlyoutBase.ShowAttachedFlyout(_itemContentButton);
+			}
+			else
+			{
+				// Fire a click event
+				breadcrumbBar.RaiseItemClickedEvent(this);
 			}
 		}
 

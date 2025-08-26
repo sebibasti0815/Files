@@ -20,33 +20,18 @@ namespace Files.App.Actions
 			=> new(Keys.F3);
 
 		public RichGlyph Glyph
-			=> new();
-
-		public bool IsExecutable
-			=> !context.IsSearchBoxVisible;
+			=> new(themedIconStyle: "App.ThemedIcons.Omnibar.Search");
 
 		public SearchAction()
 		{
 			context = Ioc.Default.GetRequiredService<IContentPageContext>();
-
-			context.PropertyChanged += Context_PropertyChanged;
 		}
 
 		public Task ExecuteAsync(object? parameter = null)
 		{
-			context.ShellPage!.ToolbarViewModel.SwitchSearchBoxVisibility();
+			context.ShellPage!.ToolbarViewModel.SwitchToSearchMode();
 
 			return Task.CompletedTask;
-		}
-
-		private void Context_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-		{
-			switch (e.PropertyName)
-			{
-				case nameof(IContentPageContext.IsSearchBoxVisible):
-					OnPropertyChanged(nameof(IsExecutable));
-					break;
-			}
 		}
 	}
 }

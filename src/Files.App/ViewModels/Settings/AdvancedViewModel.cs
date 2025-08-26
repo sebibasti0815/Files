@@ -5,12 +5,12 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using SevenZip;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Input;
 using Windows.ApplicationModel;
 using Windows.Storage;
 using Windows.Storage.Pickers;
-using Windows.System;
 using Windows.Win32.Storage.FileSystem;
 
 namespace Files.App.ViewModels.Settings
@@ -19,6 +19,7 @@ namespace Files.App.ViewModels.Settings
 	{
 		private IUserSettingsService UserSettingsService { get; } = Ioc.Default.GetRequiredService<IUserSettingsService>();
 		private ICommonDialogService CommonDialogService { get; } = Ioc.Default.GetRequiredService<ICommonDialogService>();
+		public ICommandManager Commands { get; } = Ioc.Default.GetRequiredService<ICommandManager>();
 
 		private readonly IFileTagsSettingsService fileTagsSettingsService = Ioc.Default.GetRequiredService<IFileTagsSettingsService>();
 
@@ -26,7 +27,6 @@ namespace Files.App.ViewModels.Settings
 		public ICommand SetAsOpenFileDialogCommand { get; }
 		public ICommand ExportSettingsCommand { get; }
 		public ICommand ImportSettingsCommand { get; }
-		public ICommand OpenSettingsJsonCommand { get; }
 		public AsyncRelayCommand OpenFilesOnWindowsStartupCommand { get; }
 
 
@@ -39,20 +39,9 @@ namespace Files.App.ViewModels.Settings
 			SetAsOpenFileDialogCommand = new AsyncRelayCommand(SetAsOpenFileDialogAsync);
 			ExportSettingsCommand = new AsyncRelayCommand(ExportSettingsAsync);
 			ImportSettingsCommand = new AsyncRelayCommand(ImportSettingsAsync);
-			OpenSettingsJsonCommand = new AsyncRelayCommand(OpenSettingsJsonAsync);
 			OpenFilesOnWindowsStartupCommand = new AsyncRelayCommand(OpenFilesOnWindowsStartupAsync);
 
 			_ = DetectOpenFilesAtStartupAsync();
-		}
-
-		private async Task OpenSettingsJsonAsync()
-		{
-			await SafetyExtensions.IgnoreExceptions(async () =>
-			{
-				var settingsJsonFile = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appdata:///local/settings/user_settings.json"));
-				if (!await Launcher.LaunchFileAsync(settingsJsonFile))
-					await ContextMenu.InvokeVerb("open", settingsJsonFile.Path);
-			});
 		}
 
 		private async Task SetAsDefaultExplorerAsync()
@@ -206,7 +195,7 @@ namespace Files.App.ViewModels.Settings
 
 		private async Task ExportSettingsAsync()
 		{
-			string[] extensions = [Strings.ZipFileCapitalized.GetLocalizedResource(), "*.zip" ];
+			string[] extensions = [Strings.ZipFileCapitalized.GetLocalizedResource(), "*.zip"];
 			bool result = CommonDialogService.Open_FileSaveDialog(MainWindow.Instance.WindowHandle, false, extensions, Environment.SpecialFolder.Desktop, out var filePath);
 			if (!result)
 				return;
@@ -338,7 +327,7 @@ namespace Files.App.ViewModels.Settings
 				}
 			}
 		}
-		
+
 		public bool ShowSystemTrayIcon
 		{
 			get => UserSettingsService.GeneralSettingsService.ShowSystemTrayIcon;
@@ -382,12 +371,19 @@ namespace Files.App.ViewModels.Settings
 
 			if (state != OpenOnWindowsStartup)
 			{
-				StartupTask startupTask = await StartupTask.GetAsync("3AA55462-A5FA-4933-88C4-712D0B6CDEBB");
-				if (OpenOnWindowsStartup)
-					await startupTask.RequestEnableAsync();
-				else
-					startupTask.Disable();
-				await DetectOpenFilesAtStartupAsync();
+				try
+				{
+					StartupTask startupTask = await StartupTask.GetAsync("3AA55462-A5FA-4933-88C4-712D0B6CDEBB");
+					if (OpenOnWindowsStartup)
+						await startupTask.RequestEnableAsync();
+					else
+						startupTask.Disable();
+					await DetectOpenFilesAtStartupAsync();
+				}
+				catch (COMException ex)
+				{
+					App.Logger?.LogWarning(ex, "RPC server unavailable, returning default state");
+				}
 			}
 		}
 
@@ -422,8 +418,16 @@ namespace Files.App.ViewModels.Settings
 
 		public async Task<StartupTaskState> ReadState()
 		{
-			var state = await StartupTask.GetAsync("3AA55462-A5FA-4933-88C4-712D0B6CDEBB");
-			return state.State;
+			try
+			{
+				var state = await StartupTask.GetAsync("3AA55462-A5FA-4933-88C4-712D0B6CDEBB");
+				return state.State;
+			}
+			catch (COMException ex)
+			{
+				App.Logger?.LogWarning(ex, "RPC server unavailable, returning default state");
+				return StartupTaskState.Disabled;
+			}
 		}
 	}
 }

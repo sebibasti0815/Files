@@ -2,8 +2,8 @@
 // Licensed under the MIT License.
 
 using System.Collections.Frozen;
-using System.Runtime.InteropServices;
 using System.Text;
+using Windows.Win32;
 using Forms = System.Windows.Forms;
 
 namespace Files.App.Data.Commands
@@ -278,6 +278,9 @@ namespace Files.App.Data.Commands
 		/// <returns>Humanized code with a format <see cref="HotKey"/>.</returns>
 		public static HotKey Parse(string code, bool localized = true)
 		{
+			if (string.IsNullOrEmpty(code))
+				return None;
+
 			var key = Keys.None;
 			var modifier = KeyModifiers.None;
 			bool isVisible = true;
@@ -305,7 +308,7 @@ namespace Files.App.Data.Commands
 				{
 					parts = [code];
 				}
-				else if (parts.Count > 0 && string.IsNullOrEmpty(parts.Last()))
+				else if (parts.Count > 1 && string.IsNullOrEmpty(parts.Last()))
 				{
 					// If the last part is empty, remove it and add a "+" to the last non-empty part
 					parts.RemoveAt(parts.Count - 1);
@@ -374,17 +377,17 @@ namespace Files.App.Data.Commands
 			var state = new byte[256];
 
 			// Get the current keyboard state
-			if (!Win32PInvoke.GetKeyboardState(state))
+			if (!PInvoke.GetKeyboardState(state))
 				return buffer.ToString();
 
 			// Convert the key to its virtual key code
 			var virtualKey = (uint)key;
 
 			// Map the virtual key to a scan code
-			var scanCode = Win32PInvoke.MapVirtualKey(virtualKey, 0);
+			var scanCode = PInvoke.MapVirtualKey(virtualKey, 0);
 
 			// Get the active keyboard layout
-			var keyboardLayout = Win32PInvoke.GetKeyboardLayout(0);
+			var keyboardLayout = PInvoke.GetKeyboardLayout(0);
 
 			if (Win32PInvoke.ToUnicodeEx(virtualKey, scanCode, state, buffer, buffer.Capacity, 0, keyboardLayout) > 0)
 				return buffer[^1].ToString();

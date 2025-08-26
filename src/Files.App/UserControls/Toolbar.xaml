@@ -18,7 +18,6 @@
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary Source="ms-appx:///Styles/ToolbarButtonStyle.xaml" />
-				<ResourceDictionary Source="ms-appx:///Styles/ToggleSwitchStyles.xaml" />
 			</ResourceDictionary.MergedDictionaries>
 
 			<SolidColorBrush x:Key="CommandBarBackground" Color="Transparent" />
@@ -36,6 +35,7 @@
 				x:Key="NegatedBoolToVisibilityConverter"
 				FalseValue="Visible"
 				TrueValue="Collapsed" />
+			<wctconverters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
 
 			<x:Boolean x:Key="True">True</x:Boolean>
 			<x:Boolean x:Key="False">False</x:Boolean>
@@ -72,7 +72,8 @@
 			Grid.Column="0"
 			HorizontalAlignment="Left"
 			x:Load="{x:Bind ViewModel.InstanceViewModel.IsPageTypeNotHome, Mode=OneWay}"
-			DefaultLabelPosition="Right">
+			DefaultLabelPosition="Right"
+			IsDynamicOverflowEnabled="{x:Bind ViewModel.IsDynamicOverflowEnabled, Mode=OneWay}">
 			<CommandBar.PrimaryCommands>
 
 				<!--  New Item  -->
@@ -287,13 +288,13 @@
 					x:Name="ExtractButton"
 					Width="Auto"
 					MinWidth="40"
-					x:Load="{x:Bind ViewModel.CanExtract, Mode=OneWay, FallbackValue=False}"
 					AccessKey="Z"
 					AccessKeyInvoked="AppBarButton_AccessKeyInvoked"
 					IsEnabled="{x:Bind ViewModel.CanExtract, Mode=OneWay, FallbackValue=False}"
 					Label="{helpers:ResourceString Name=Extract}"
 					LabelPosition="Default"
-					Style="{StaticResource ToolBarAppBarButtonFlyoutStyle}">
+					Style="{StaticResource ToolBarAppBarButtonFlyoutStyle}"
+					Visibility="{x:Bind ViewModel.CanExtract, Mode=OneWay}">
 
 					<controls:ThemedIcon Style="{StaticResource App.ThemedIcons.Zip}" />
 
@@ -302,29 +303,25 @@
 							<MenuFlyoutItem
 								x:Name="ExtractSingle"
 								Command="{x:Bind Commands.DecompressArchive, Mode=OneWay}"
-								IsEnabled="{x:Bind ViewModel.CanExtract, Mode=OneWay, FallbackValue=False}"
 								KeyboardAcceleratorTextOverride="{x:Bind Commands.DecompressArchive.HotKeyText, Mode=OneWay}"
 								Text="{x:Bind Commands.DecompressArchive.Label}"
-								Visibility="{x:Bind ViewModel.IsMultipleArchivesSelected, Mode=OneWay, Converter={StaticResource NegatedBoolToVisibilityConverter}}" />
+								Visibility="{x:Bind Commands.DecompressArchive.IsExecutable, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
 							<MenuFlyoutItem
 								x:Name="ExtractHereSmart"
 								Command="{x:Bind Commands.DecompressArchiveHereSmart, Mode=OneWay}"
-								IsEnabled="{x:Bind ViewModel.IsSelectionArchivesOnly, Mode=OneWay, FallbackValue=False}"
 								KeyboardAcceleratorTextOverride="{x:Bind Commands.DecompressArchiveHereSmart.HotKeyText, Mode=OneWay}"
 								Text="{x:Bind Commands.DecompressArchiveHereSmart.Label}"
-								Visibility="{x:Bind ViewModel.IsArchiveOpened, Mode=OneWay, Converter={StaticResource NegatedBoolToVisibilityConverter}}" />
+								Visibility="{x:Bind Commands.DecompressArchiveHereSmart.IsExecutable, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
 							<MenuFlyoutItem
 								x:Name="ExtractHere"
 								Command="{x:Bind Commands.DecompressArchiveHere, Mode=OneWay}"
-								IsEnabled="{x:Bind ViewModel.IsSelectionArchivesOnly, Mode=OneWay, FallbackValue=False}"
 								Text="{x:Bind Commands.DecompressArchiveHere.Label}"
-								Visibility="{x:Bind ViewModel.IsArchiveOpened, Mode=OneWay, Converter={StaticResource NegatedBoolToVisibilityConverter}}" />
+								Visibility="{x:Bind Commands.DecompressArchiveHere.IsExecutable, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
 							<MenuFlyoutItem
 								x:Name="ExtractTo"
 								Command="{x:Bind Commands.DecompressArchiveToChildFolder, Mode=OneWay}"
-								IsEnabled="{x:Bind ViewModel.IsSelectionArchivesOnly, Mode=OneWay, FallbackValue=False}"
 								Text="{x:Bind Commands.DecompressArchiveToChildFolder.Label, Mode=OneWay}"
-								Visibility="{x:Bind ViewModel.IsArchiveOpened, Mode=OneWay, Converter={StaticResource NegatedBoolToVisibilityConverter}}" />
+								Visibility="{x:Bind Commands.DecompressArchiveToChildFolder.IsExecutable, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
 						</MenuFlyout>
 					</AppBarButton.Flyout>
 
@@ -335,12 +332,12 @@
 					x:Name="RunWithPowerShellButton"
 					Width="Auto"
 					MinWidth="40"
-					x:Load="{x:Bind Commands.RunWithPowershell.IsExecutable, Mode=OneWay}"
 					AutomationProperties.Name="RunWithPowerShell"
 					Command="{x:Bind Commands.RunWithPowershell}"
 					Label="{x:Bind Commands.RunWithPowershell.Label}"
 					LabelPosition="Default"
-					ToolTipService.ToolTip="{x:Bind Commands.RunWithPowershell.LabelWithHotKey, Mode=OneWay}">
+					ToolTipService.ToolTip="{x:Bind Commands.RunWithPowershell.LabelWithHotKey, Mode=OneWay}"
+					Visibility="{x:Bind Commands.RunWithPowershell.IsExecutable, Mode=OneWay}">
 					<AppBarButton.Icon>
 						<FontIcon Foreground="{ThemeResource App.Theme.IconBaseBrush}" Glyph="{x:Bind Commands.RunWithPowershell.Glyph.BaseGlyph}" />
 					</AppBarButton.Icon>
@@ -351,12 +348,12 @@
 					x:Name="EditInNotepadButton"
 					Width="Auto"
 					MinWidth="40"
-					x:Load="{x:Bind Commands.EditInNotepad.IsExecutable, Mode=OneWay}"
 					AutomationProperties.Name="EditInNotepad"
 					Command="{x:Bind Commands.EditInNotepad}"
 					Label="{x:Bind Commands.EditInNotepad.Label}"
 					LabelPosition="Default"
-					ToolTipService.ToolTip="{x:Bind Commands.EditInNotepad.LabelWithHotKey, Mode=OneWay}">
+					ToolTipService.ToolTip="{x:Bind Commands.EditInNotepad.LabelWithHotKey, Mode=OneWay}"
+					Visibility="{x:Bind Commands.EditInNotepad.IsExecutable, Mode=OneWay}">
 					<AppBarButton.Icon>
 						<FontIcon Foreground="{ThemeResource App.Theme.IconBaseBrush}" Glyph="{x:Bind Commands.EditInNotepad.Glyph.BaseGlyph}" />
 					</AppBarButton.Icon>
@@ -367,11 +364,11 @@
 					x:Name="SetAsBackgroundButton"
 					Width="Auto"
 					MinWidth="40"
-					x:Load="{x:Bind Commands.SetAsWallpaperBackground.IsExecutable, Mode=OneWay}"
 					Label="{helpers:ResourceString Name=SetAsBackgroundFlyout}"
 					LabelPosition="Default"
 					Style="{StaticResource ToolBarAppBarButtonFlyoutStyle}"
-					ToolTipService.ToolTip="{helpers:ResourceString Name=SetAsBackgroundFlyout}">
+					ToolTipService.ToolTip="{helpers:ResourceString Name=SetAsBackgroundFlyout}"
+					Visibility="{x:Bind Commands.SetAsWallpaperBackground.IsExecutable, Mode=OneWay}">
 
 					<controls:ThemedIcon Style="{StaticResource App.ThemedIcons.SetWallpaper.16}" />
 
@@ -414,21 +411,21 @@
 					x:Name="SetAsSlideshowButton"
 					Width="Auto"
 					MinWidth="40"
-					x:Load="{x:Bind Commands.SetAsSlideshowBackground.IsExecutable, Mode=OneWay}"
 					Command="{x:Bind Commands.SetAsSlideshowBackground}"
 					Icon="{x:Bind Commands.SetAsSlideshowBackground.FontIcon}"
 					Label="{x:Bind Commands.SetAsSlideshowBackground.Label}"
 					LabelPosition="Default"
-					ToolTipService.ToolTip="{x:Bind Commands.SetAsSlideshowBackground.LabelWithHotKey, Mode=OneWay}" />
+					ToolTipService.ToolTip="{x:Bind Commands.SetAsSlideshowBackground.LabelWithHotKey, Mode=OneWay}"
+					Visibility="{x:Bind Commands.SetAsSlideshowBackground.IsExecutable, Mode=OneWay}" />
 
 				<!--  Install Inf  -->
 				<AppBarButton
 					x:Name="InstallInfButton"
-					x:Load="{x:Bind Commands.InstallInfDriver.IsExecutable, Mode=OneWay, FallbackValue=False}"
 					Command="{x:Bind Commands.InstallInfDriver, Mode=OneWay}"
 					Label="{x:Bind Commands.InstallInfDriver.Label}"
 					LabelPosition="Default"
-					ToolTipService.ToolTip="{helpers:ResourceString Name=Install}">
+					ToolTipService.ToolTip="{helpers:ResourceString Name=Install}"
+					Visibility="{x:Bind Commands.InstallInfDriver.IsExecutable, Mode=OneWay}">
 					<AppBarButton.Icon>
 						<FontIcon Foreground="{ThemeResource App.Theme.IconBaseBrush}" Glyph="{x:Bind Commands.InstallInfDriver.Glyph.BaseGlyph}" />
 					</AppBarButton.Icon>
@@ -437,44 +434,44 @@
 				<!--  Rotate Image Left  -->
 				<AppBarButton
 					x:Name="RotateImageLeftButton"
-					x:Load="{x:Bind ViewModel.IsImage, Mode=OneWay, FallbackValue=False}"
 					Command="{x:Bind Commands.RotateLeft, Mode=OneWay}"
 					Label="{x:Bind Commands.RotateLeft.Label}"
 					LabelPosition="Default"
-					ToolTipService.ToolTip="{helpers:ResourceString Name=RotateLeft}">
+					ToolTipService.ToolTip="{helpers:ResourceString Name=RotateLeft}"
+					Visibility="{x:Bind Commands.RotateLeft.IsExecutable, Mode=OneWay}">
 					<controls:ThemedIcon Style="{x:Bind Commands.RotateLeft.ThemedIconStyle}" />
 				</AppBarButton>
 
 				<!--  Rotate Image Right  -->
 				<AppBarButton
 					x:Name="RotateImageRightButton"
-					x:Load="{x:Bind ViewModel.IsImage, Mode=OneWay, FallbackValue=False}"
 					Command="{x:Bind Commands.RotateRight, Mode=OneWay}"
 					Label="{x:Bind Commands.RotateRight.Label}"
 					LabelPosition="Default"
-					ToolTipService.ToolTip="{helpers:ResourceString Name=RotateRight}">
+					ToolTipService.ToolTip="{helpers:ResourceString Name=RotateRight}"
+					Visibility="{x:Bind Commands.RotateRight.IsExecutable, Mode=OneWay}">
 					<controls:ThemedIcon Style="{x:Bind Commands.RotateRight.ThemedIconStyle}" />
 				</AppBarButton>
 
 				<!--  Install Font  -->
 				<AppBarButton
 					x:Name="InstallFontButton"
-					x:Load="{x:Bind Commands.InstallFont.IsExecutable, Mode=OneWay, FallbackValue=False}"
 					Command="{x:Bind Commands.InstallFont, Mode=OneWay}"
 					Label="{x:Bind Commands.InstallFont.Label}"
 					LabelPosition="Default"
-					ToolTipService.ToolTip="{helpers:ResourceString Name=Install}">
+					ToolTipService.ToolTip="{helpers:ResourceString Name=Install}"
+					Visibility="{x:Bind Commands.InstallFont.IsExecutable, Mode=OneWay}">
 					<controls:ThemedIcon Style="{x:Bind Commands.InstallFont.ThemedIconStyle}" />
 				</AppBarButton>
 
 				<!--  Install Certificate  -->
 				<AppBarButton
 					x:Name="InstallCertificateButton"
-					x:Load="{x:Bind Commands.InstallCertificate.IsExecutable, Mode=OneWay, FallbackValue=False}"
 					Command="{x:Bind Commands.InstallCertificate, Mode=OneWay}"
 					Label="{x:Bind Commands.InstallCertificate.Label}"
 					LabelPosition="Default"
-					ToolTipService.ToolTip="{helpers:ResourceString Name=Install}">
+					ToolTipService.ToolTip="{helpers:ResourceString Name=Install}"
+					Visibility="{x:Bind Commands.InstallCertificate.IsExecutable, Mode=OneWay}">
 					<AppBarButton.Icon>
 						<FontIcon Foreground="{ThemeResource App.Theme.IconBaseBrush}" Glyph="{x:Bind Commands.InstallCertificate.Glyph.BaseGlyph, Mode=OneTime}" />
 					</AppBarButton.Icon>
@@ -483,12 +480,12 @@
 				<!--  Play All Media  -->
 				<AppBarButton
 					x:Name="PlayAllMediaButton"
-					x:Load="{x:Bind Commands.PlayAll.IsExecutable, Mode=OneWay, FallbackValue=False}"
 					Command="{x:Bind Commands.PlayAll, Mode=OneWay}"
 					KeyboardAcceleratorTextOverride="{x:Bind Commands.PlayAll.HotKeyText, Mode=OneWay}"
 					Label="{x:Bind Commands.PlayAll.Label}"
 					LabelPosition="Default"
-					ToolTipService.ToolTip="{x:Bind Commands.PlayAll.LabelWithHotKey, Mode=OneWay}">
+					ToolTipService.ToolTip="{x:Bind Commands.PlayAll.LabelWithHotKey, Mode=OneWay}"
+					Visibility="{x:Bind Commands.PlayAll.IsExecutable, Mode=OneWay}">
 					<AppBarButton.Icon>
 						<FontIcon Foreground="{ThemeResource App.Theme.IconBaseBrush}" Glyph="{x:Bind Commands.PlayAll.Glyph.BaseGlyph}" />
 					</AppBarButton.Icon>
@@ -502,6 +499,21 @@
 			x:Name="BaseCommandBar"
 			Grid.Column="1"
 			DefaultLabelPosition="Right">
+
+			<!--  Toggle filter header  -->
+			<AppBarToggleButton
+				x:Name="FilterHeader"
+				Width="Auto"
+				MinWidth="40"
+				AccessKey="F"
+				AccessKeyInvoked="AppBarButton_AccessKeyInvoked"
+				AutomationProperties.Name="{x:Bind Commands.ToggleFilterHeader.AutomationName}"
+				IsChecked="{x:Bind Commands.ToggleFilterHeader.IsOn, Mode=TwoWay}"
+				Label="{x:Bind Commands.ToggleFilterHeader.Label}"
+				LabelPosition="Collapsed"
+				ToolTipService.ToolTip="{x:Bind Commands.ToggleFilterHeader.LabelWithHotKey, Mode=OneWay}">
+				<controls:ThemedIcon Style="{StaticResource App.ThemedIcons.Filter}" />
+			</AppBarToggleButton>
 
 			<!--  Selection Commands  -->
 			<AppBarButton
@@ -1176,11 +1188,11 @@
 								<ToggleSwitch
 									Grid.Row="0"
 									Grid.Column="1"
+									MinWidth="68"
 									HorizontalAlignment="Right"
 									AccessKey="H"
 									AutomationProperties.Name="{x:Bind Commands.ToggleShowHiddenItems.AutomationName}"
 									IsOn="{x:Bind Commands.ToggleShowHiddenItems.IsOn, Mode=TwoWay}"
-									Style="{StaticResource RightAlignedToggleSwitchStyle}"
 									ToolTipService.ToolTip="{x:Bind Commands.ToggleShowHiddenItems.HotKeyText, Mode=OneWay}" />
 
 								<!--  Show File Extensions  -->
@@ -1193,12 +1205,12 @@
 								<ToggleSwitch
 									Grid.Row="1"
 									Grid.Column="1"
+									MinWidth="68"
 									HorizontalAlignment="Right"
 									AccessKey="E"
 									AutomationProperties.Name="{x:Bind Commands.ToggleShowFileExtensions.AutomationName}"
 									IsOn="{x:Bind Commands.ToggleShowFileExtensions.IsOn, Mode=TwoWay}"
 									Rotation="1"
-									Style="{StaticResource RightAlignedToggleSwitchStyle}"
 									ToolTipService.ToolTip="{x:Bind Commands.ToggleShowFileExtensions.HotKeyText, Mode=OneWay}" />
 
 								<!--  Adaptive Layout  -->
@@ -1214,13 +1226,13 @@
 									x:Name="AdaptiveLayoutToggleSwitch"
 									Grid.Row="2"
 									Grid.Column="1"
+									MinWidth="68"
 									HorizontalAlignment="Right"
 									x:Load="{x:Bind Commands.LayoutAdaptive.IsExecutable, Mode=OneWay}"
 									AutomationProperties.Name="{x:Bind Commands.LayoutAdaptive.AutomationName}"
 									IsEnabled="{x:Bind Commands.LayoutAdaptive.IsExecutable, Mode=OneWay}"
 									IsOn="{x:Bind Commands.LayoutAdaptive.IsOn, Mode=TwoWay}"
 									Rotation="1"
-									Style="{StaticResource RightAlignedToggleSwitchStyle}"
 									ToolTipService.ToolTip="{x:Bind Commands.LayoutAdaptive.LabelWithHotKey, Mode=OneWay}" />
 							</Grid>
 
