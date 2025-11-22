@@ -1773,7 +1773,7 @@
     <value>Мітка</value>
   </data>
   <data name="SettingsOpenItemsWithOneClick" xml:space="preserve">
-    <value>Відкривати елементи одним кліком</value>
+    <value>Open files with a single click</value>
   </data>
   <data name="FolderPath" xml:space="preserve">
     <value>Шлях до папки</value>
@@ -2072,8 +2072,8 @@
   <data name="Lockscreen" xml:space="preserve">
     <value>Екран блокування</value>
   </data>
-  <data name="OpenFolderWithOneClickColumnsLayout" xml:space="preserve">
-    <value>Відкрити папки одним натисканням по Макету Стовпчиків</value>
+  <data name="OpenFolderWithOneClick" xml:space="preserve">
+    <value>Open folders with a single click</value>
   </data>
   <data name="OpeningItems" xml:space="preserve">
     <value>Відкриття елементів</value>
@@ -3487,6 +3487,9 @@
   <data name="ProcessingItems" xml:space="preserve">
     <value>Опрацювання елементів...</value>
   </data>
+  <data name="DiscoveringItems" xml:space="preserve">
+    <value>Виявлення елементів...</value>
+  </data>
   <data name="SpeedWithColon" xml:space="preserve">
     <value>Швидкість:</value>
   </data>
@@ -3617,6 +3620,10 @@
   <data name="StatusCenter_CopyInProgress_SubHeader" xml:space="preserve">
     <value>Копіювання {0, plural, one {# елемент} few {# елементи} many {# елементів} other {# елементів}} з «{1}» до «{2}»</value>
     <comment>Shown in a StatusCenter card.</comment>
+  </data>
+  <data name="StatusCenter_CopyDiscovery_Header" xml:space="preserve">
+    <value>Виявлено {0, plural, one {# елемент} few {# елементи} many {# елементів} other {# елементів}}</value>
+    <comment>Shown in a StatusCenter card during file discovery phase.</comment>
   </data>
   <data name="StatusCenter_DecompressCanceled_Header" xml:space="preserve">
     <value>Скасовано видобування "{0}" до "{1}"</value>
@@ -4324,5 +4331,11 @@
   </data>
   <data name="FailedToOpenLogFile" xml:space="preserve">
     <value>Не вдається відкрити файл журналу</value>
+  </data>
+  <data name="ShowStatusBar" xml:space="preserve">
+    <value>Показувати рядок стану</value>
+  </data>
+  <data name="OnlyInColumnsView" xml:space="preserve">
+    <value>Only in Columns View</value>
   </data>
 </root>

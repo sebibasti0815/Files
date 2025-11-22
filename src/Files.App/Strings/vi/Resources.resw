@@ -1110,7 +1110,7 @@
     <value>Bật tắt hai ngăn</value>
   </data>
   <data name="ToggleDualPaneDescription" xml:space="preserve">
-    <value>Bật tắt chế độ hai ngăn</value>
+    <value>Bật hoặc tắt chế độ hai ngăn</value>
   </data>
   <data name="DetailsPanePreviewNotAvaliableText" xml:space="preserve">
     <value>Không có bản xem trước</value>
@@ -1773,7 +1773,7 @@
     <value>Nhãn</value>
   </data>
   <data name="SettingsOpenItemsWithOneClick" xml:space="preserve">
-    <value>Mở khoản mục bằng một lần nhấp</value>
+    <value>Mở tệp bằng một lần nhấp</value>
   </data>
   <data name="FolderPath" xml:space="preserve">
     <value>Đường dẫn thư mục</value>
@@ -2072,8 +2072,8 @@
   <data name="Lockscreen" xml:space="preserve">
     <value>Màn hình khóa</value>
   </data>
-  <data name="OpenFolderWithOneClickColumnsLayout" xml:space="preserve">
-    <value>Mở thư mục bằng một lần nhấp trong bố cục cột</value>
+  <data name="OpenFolderWithOneClick" xml:space="preserve">
+    <value>Mở thư mục bằng một lần nhấp</value>
   </data>
   <data name="OpeningItems" xml:space="preserve">
     <value>Mở các khoản mục</value>
@@ -3487,6 +3487,9 @@
   <data name="ProcessingItems" xml:space="preserve">
     <value>Đang xử lý khoản mục...</value>
   </data>
+  <data name="DiscoveringItems" xml:space="preserve">
+    <value>Đang quét tìm khoản mục...</value>
+  </data>
   <data name="SpeedWithColon" xml:space="preserve">
     <value>Tốc độ:</value>
   </data>
@@ -3617,6 +3620,10 @@
   <data name="StatusCenter_CopyInProgress_SubHeader" xml:space="preserve">
     <value>Đang sao chép {0, plural, other {# khoản mục}} từ "{1}" đến "{2}"</value>
     <comment>Shown in a StatusCenter card.</comment>
+  </data>
+  <data name="StatusCenter_CopyDiscovery_Header" xml:space="preserve">
+    <value>Đã tìm thấy {0, plural, other {# khoản mục}}</value>
+    <comment>Shown in a StatusCenter card during file discovery phase.</comment>
   </data>
   <data name="StatusCenter_DecompressCanceled_Header" xml:space="preserve">
     <value>Đã hủy giải nén "{0}" vào "{1}"</value>
@@ -4190,7 +4197,7 @@
     <value>Đường dẫn không hợp lệ</value>
   </data>
   <data name="TestIntegration" xml:space="preserve">
-    <value>Kiểm tra tích hợp</value>
+    <value>Kiểm thử</value>
   </data>
   <data name="IDENotLocatedContent" xml:space="preserve">
     <value>Không tìm thấy {0}. Vui lòng kiểm tra cài đặt của bạn và thử lại.</value>
@@ -4305,7 +4312,7 @@
     <value>Có giá trị từ:</value>
   </data>
   <data name="ValidTo" xml:space="preserve">
-    <value>Hết hạn vào:</value>
+    <value>Hết hạn sau:</value>
   </data>
   <data name="NoSignatureFound" xml:space="preserve">
     <value>Không tìm thấy chữ ký nào.</value>
@@ -4324,5 +4331,11 @@
   </data>
   <data name="FailedToOpenLogFile" xml:space="preserve">
     <value>Không thể mở tệp nhật ký</value>
+  </data>
+  <data name="ShowStatusBar" xml:space="preserve">
+    <value>Hiện thanh trạng thái</value>
+  </data>
+  <data name="OnlyInColumnsView" xml:space="preserve">
+    <value>Chỉ trong bố cục cột</value>
   </data>
 </root>

@@ -1773,7 +1773,7 @@
     <value>Dosya etiketi</value>
   </data>
   <data name="SettingsOpenItemsWithOneClick" xml:space="preserve">
-    <value>Öğeleri tek tıklamayla aç</value>
+    <value>Open files with a single click</value>
   </data>
   <data name="FolderPath" xml:space="preserve">
     <value>Klasör yolu</value>
@@ -2072,8 +2072,8 @@
   <data name="Lockscreen" xml:space="preserve">
     <value>Kilit Ekranı</value>
   </data>
-  <data name="OpenFolderWithOneClickColumnsLayout" xml:space="preserve">
-    <value>Sütun düzeninde tek tıklama ile klasörleri aç</value>
+  <data name="OpenFolderWithOneClick" xml:space="preserve">
+    <value>Open folders with a single click</value>
   </data>
   <data name="OpeningItems" xml:space="preserve">
     <value>Açılış öğeleri</value>
@@ -3473,7 +3473,7 @@
     <comment>Shown in a StatusCenter card. Used as "64 MB of 1 GB processed"</comment>
   </data>
   <data name="ItemsLower" xml:space="preserve">
-    <value>ögeler</value>
+    <value>öğe</value>
   </data>
   <data name="CannotInitializeGitRepo" xml:space="preserve">
     <value>Dosyalar bu dizini Git deposu olarak başlatamaz.</value>
@@ -3486,6 +3486,9 @@
   </data>
   <data name="ProcessingItems" xml:space="preserve">
     <value>Öğeler işleniyor...</value>
+  </data>
+  <data name="DiscoveringItems" xml:space="preserve">
+    <value>Ögeler bulunuyor...</value>
   </data>
   <data name="SpeedWithColon" xml:space="preserve">
     <value>Hız:</value>
@@ -3617,6 +3620,10 @@
   <data name="StatusCenter_CopyInProgress_SubHeader" xml:space="preserve">
     <value>{0, plural,one {# öğe}other {# öğe}} "{1}" konumundan "{2}" konumuna kopyalanıyor</value>
     <comment>Shown in a StatusCenter card.</comment>
+  </data>
+  <data name="StatusCenter_CopyDiscovery_Header" xml:space="preserve">
+    <value>{0, plural,one {# öge}other {# öge}} bulundu</value>
+    <comment>Shown in a StatusCenter card during file discovery phase.</comment>
   </data>
   <data name="StatusCenter_DecompressCanceled_Header" xml:space="preserve">
     <value>"{0}" öğesinin "{1}" öğesine çıkarılması iptal edildi</value>
@@ -4324,5 +4331,11 @@
   </data>
   <data name="FailedToOpenLogFile" xml:space="preserve">
     <value>Günlük dosyası açılamıyor</value>
+  </data>
+  <data name="ShowStatusBar" xml:space="preserve">
+    <value>Show status bar</value>
+  </data>
+  <data name="OnlyInColumnsView" xml:space="preserve">
+    <value>Only in Columns View</value>
   </data>
 </root>

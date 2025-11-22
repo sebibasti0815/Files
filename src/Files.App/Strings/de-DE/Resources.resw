@@ -1773,7 +1773,7 @@
     <value>Tag</value>
   </data>
   <data name="SettingsOpenItemsWithOneClick" xml:space="preserve">
-    <value>Elemente mit einem Klick öffnen</value>
+    <value>Dateien mit einem einzigen Klick öffnen</value>
   </data>
   <data name="FolderPath" xml:space="preserve">
     <value>Ordnerpfad</value>
@@ -2072,8 +2072,8 @@
   <data name="Lockscreen" xml:space="preserve">
     <value>Sperrbildschirm</value>
   </data>
-  <data name="OpenFolderWithOneClickColumnsLayout" xml:space="preserve">
-    <value>Ordner mit einem Klick im Spaltenlayout öffnen</value>
+  <data name="OpenFolderWithOneClick" xml:space="preserve">
+    <value>Ordner mit einem einzigen Klick öffnen</value>
   </data>
   <data name="OpeningItems" xml:space="preserve">
     <value>Öffne Elemente</value>
@@ -3487,6 +3487,9 @@
   <data name="ProcessingItems" xml:space="preserve">
     <value>Elemente werden verarbeitet...</value>
   </data>
+  <data name="DiscoveringItems" xml:space="preserve">
+    <value>Elemente werden gesucht...</value>
+  </data>
   <data name="SpeedWithColon" xml:space="preserve">
     <value>Geschwindigkeit:</value>
   </data>
@@ -3617,6 +3620,10 @@
   <data name="StatusCenter_CopyInProgress_SubHeader" xml:space="preserve">
     <value>Kopiere {0, plural, one {# Element} other {# Elemente}} von "{1}" nach "{2}"</value>
     <comment>Shown in a StatusCenter card.</comment>
+  </data>
+  <data name="StatusCenter_CopyDiscovery_Header" xml:space="preserve">
+    <value>{0, plural, one {# Element} other {# Elemente}} gefunden</value>
+    <comment>Shown in a StatusCenter card during file discovery phase.</comment>
   </data>
   <data name="StatusCenter_DecompressCanceled_Header" xml:space="preserve">
     <value>Entpacken von "{0}" nach "{1}" abgebrochen</value>
@@ -4324,5 +4331,11 @@
   </data>
   <data name="FailedToOpenLogFile" xml:space="preserve">
     <value>Log-Datei konnte nicht geöffnet werden</value>
+  </data>
+  <data name="ShowStatusBar" xml:space="preserve">
+    <value>Statusleiste anzeigen</value>
+  </data>
+  <data name="OnlyInColumnsView" xml:space="preserve">
+    <value>Nur in der Spaltenansicht</value>
   </data>
 </root>

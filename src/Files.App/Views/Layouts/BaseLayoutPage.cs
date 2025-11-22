@@ -388,6 +388,12 @@ namespace Files.App.Views.Layouts
 				}
 
 				ParentShellPageInstance.ShellViewModel.UpdateEmptyTextType();
+
+				// Focus on the active pane in case it was lost during the layout switch.
+				// Allthough the focus is also set from SetSelectedItemsOnNavigation,
+				// that is only called when switching between a Grid based layout and Details,
+				// not between different Grid based layouts (eg. List and Cards).
+				ParentShellPageInstance!.PaneHolder.FocusActivePane();
 			}
 		}
 
@@ -506,7 +512,7 @@ namespace Files.App.Views.Layouts
 			BaseContextMenuFlyout.Opening += BaseContextFlyout_Opening;
 		}
 
-		public void SetSelectedItemsOnNavigation()
+		public async void SetSelectedItemsOnNavigation()
 		{
 			try
 			{
@@ -522,10 +528,14 @@ namespace Files.App.Views.Layouts
 					ItemManipulationModel.SetSelectedItems(listedItemsToSelect);
 					ItemManipulationModel.FocusSelectedItems();
 				}
-				else if (navigationArguments is not null && navigationArguments.FocusOnNavigation)
+				else if (navigationArguments is not null && ParentShellPageInstance!.InstanceViewModel.FolderSettings.LayoutMode is not FolderLayoutModes.ColumnView)
 				{
-					// Set focus on layout specific file list control
-					ItemManipulationModel.FocusFileList();
+					// Delay to ensure the new layout is loaded
+					if (navigationArguments.IsLayoutSwitch)
+						await Task.Delay(100);
+
+					// Focus on the active pane in case it was lost during navigation
+					ParentShellPageInstance!.PaneHolder.FocusActivePane();
 				}
 			}
 			catch (Exception) { }
@@ -1239,9 +1249,6 @@ namespace Files.App.Views.Layouts
 						await ParentShellPageInstance!.ShellViewModel.LoadExtendedItemPropertiesAsync(listedItem);
 						if (ParentShellPageInstance.ShellViewModel.EnabledGitProperties is not GitProperties.None && listedItem is IGitItem gitItem)
 							await ParentShellPageInstance.ShellViewModel.LoadGitPropertiesAsync(gitItem);
-
-						// Focus file list when items finish loading (#16530)
-						ItemManipulationModel.FocusFileList();
 					});
 				}
 			}

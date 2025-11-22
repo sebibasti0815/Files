@@ -3,6 +3,7 @@
 
 namespace Files.App.Actions
 {
+	[GeneratedRichCommand]
 	internal sealed partial class ToggleFilterHeaderAction : ObservableObject, IToggleAction
 	{
 		private readonly IGeneralSettingsService generalSettingsService = Ioc.Default.GetRequiredService<IGeneralSettingsService>();
@@ -32,8 +33,14 @@ namespace Files.App.Actions
 		{
 			generalSettingsService.ShowFilterHeader = !IsOn;
 
-			if (IsOn)
-				ContentPageContext.ShellPage!.ShellViewModel.InvokeFocusFilterHeader();
+			// Only attempt to focus if there's an active shell page
+			if (ContentPageContext.ShellPage is not null)
+			{
+				if (IsOn)
+					ContentPageContext.ShellPage.ShellViewModel.InvokeFocusFilterHeader();
+				else
+					ContentPageContext.ShellPage.PaneHolder.FocusActivePane();
+			}
 
 			return Task.CompletedTask;
 		}

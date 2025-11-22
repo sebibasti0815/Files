@@ -37,8 +37,6 @@ namespace Files.App.Views.Layouts
 		/// </summary>
 		private uint currentIconSize;
 
-		private RectangleSelection? _rectangleSelection;
-
 		// Properties
 
 		protected override ListViewBase ListViewBase => FileList;
@@ -79,8 +77,8 @@ namespace Files.App.Views.Layouts
 		{
 			InitializeComponent();
 			DataContext = this;
-			_rectangleSelection = RectangleSelection.Create(FileList, SelectionRectangle, FileList_SelectionChanged);
-			_rectangleSelection.SelectionEnded += SelectionRectangle_SelectionEnded;
+			var selectionRectangle = RectangleSelection.Create(FileList, SelectionRectangle, FileList_SelectionChanged);
+			selectionRectangle.SelectionEnded += SelectionRectangle_SelectionEnded;
 
 			UpdateSortOptionsCommand = new RelayCommand<string>(x =>
 			{
@@ -204,11 +202,6 @@ namespace Files.App.Views.Layouts
 			FolderSettings.SortOptionPreferenceUpdated -= FolderSettings_SortOptionPreferenceUpdated;
 			ParentShellPageInstance.ShellViewModel.PageTypeUpdated -= FilesystemViewModel_PageTypeUpdated;
 			UserSettingsService.LayoutSettingsService.PropertyChanged -= LayoutSettingsService_PropertyChanged;
-			if (_rectangleSelection is not null)
-			{
-				_rectangleSelection.SelectionEnded -= SelectionRectangle_SelectionEnded;
-				_rectangleSelection = null;
-			}
 		}
 
 		private void LayoutSettingsService_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -465,8 +458,8 @@ namespace Files.App.Views.Layouts
 
 				if (ctrlPressed && !shiftPressed)
 				{
-					var folders = ParentShellPageInstance?.SlimContentPage.SelectedItems?.Where(file => file.PrimaryItemAttribute == StorageItemTypes.Folder);
-					if (folders is not null)
+					var folders = SelectedItems?.Where(file => file.PrimaryItemAttribute == StorageItemTypes.Folder);
+					if (folders?.Any() ?? false)
 					{
 						foreach (ListedItem folder in folders)
 							await NavigationHelpers.OpenPathInNewTab(folder.ItemPath);
@@ -474,9 +467,19 @@ namespace Files.App.Views.Layouts
 				}
 				else if (ctrlPressed && shiftPressed)
 				{
-					var selectedFolder = SelectedItems?.FirstOrDefault(item => item.PrimaryItemAttribute == StorageItemTypes.Folder);
-					if (selectedFolder is not null)
-						NavigationHelpers.OpenInSecondaryPane(ParentShellPageInstance, selectedFolder);
+					var selectedFolders = SelectedItems?.Where(item => item.PrimaryItemAttribute == StorageItemTypes.Folder);
+					if (selectedFolders?.Count() == 1)
+					{
+						NavigationHelpers.OpenInSecondaryPane(ParentShellPageInstance, selectedFolders.First());
+					}
+				}
+				else if (!ctrlPressed && !shiftPressed && !UserSettingsService.FoldersSettingsService.OpenItemsWithOneClick)
+				{
+					if (SelectedItems?.Any() ?? false)
+					{
+						foreach (var selectedItem in SelectedItems)
+							await OpenItem(selectedItem);
+					}
 				}
 			}
 			else if (e.Key == VirtualKey.Enter && e.KeyStatus.IsMenuKeyDown)
@@ -590,7 +593,8 @@ namespace Files.App.Views.Layouts
 			}
 
 			// Check if the setting to open items with a single click is turned on
-			if (UserSettingsService.FoldersSettingsService.OpenItemsWithOneClick)
+			if ((item.PrimaryItemAttribute is StorageItemTypes.File && UserSettingsService.FoldersSettingsService.OpenItemsWithOneClick) ||
+				(item.PrimaryItemAttribute is StorageItemTypes.Folder && UserSettingsService.FoldersSettingsService.OpenFoldersWithOneClick is OpenFoldersWithOneClickEnum.Always))
 			{
 				ResetRenameDoubleClick();
 				await Commands.OpenItem.ExecuteAsync();
@@ -614,12 +618,36 @@ namespace Files.App.Views.Layouts
 			}
 		}
 
+		private async Task OpenItem(ListedItem item)
+		{
+			if (!Commands.OpenItem.IsExecutable)
+			{
+				// Fallback if the command is not executable. It occurs only when search is performed from the columns view.
+				var itemType = item.PrimaryItemAttribute == StorageItemTypes.Folder ? FilesystemItemType.Directory : FilesystemItemType.File;
+				await NavigationHelpers.OpenPath(item.ItemPath, ParentShellPageInstance, itemType);
+			}
+			else
+			{
+				await Commands.OpenItem.ExecuteAsync();
+			}
+		}
+
 		private async void FileList_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
 		{
 			// Skip opening selected items if the double tap doesn't capture an item
-			if ((e.OriginalSource as FrameworkElement)?.DataContext is ListedItem item && !UserSettingsService.FoldersSettingsService.OpenItemsWithOneClick)
-				await Commands.OpenItem.ExecuteAsync();
-			else if ((e.OriginalSource as FrameworkElement)?.DataContext is not ListedItem && UserSettingsService.FoldersSettingsService.DoubleClickToGoUp)
+			var originalElement = e.OriginalSource as FrameworkElement;
+			var dataContext = originalElement?.DataContext;
+
+			// Try to get the item from DataContext or from sender (ListView)
+			ListedItem? item = dataContext as ListedItem;
+			if (item == null && sender is ListView listView && listView.SelectedItem is ListedItem selectedItem)
+				item = selectedItem;
+
+			if (item != null && item.PrimaryItemAttribute == StorageItemTypes.File && !UserSettingsService.FoldersSettingsService.OpenItemsWithOneClick)
+				await OpenItem(item);
+			else if (item != null && item.PrimaryItemAttribute == StorageItemTypes.Folder && UserSettingsService.FoldersSettingsService.OpenFoldersWithOneClick is not OpenFoldersWithOneClickEnum.Always)
+				await OpenItem(item);
+			else if (item == null && UserSettingsService.FoldersSettingsService.DoubleClickToGoUp)
 				await Commands.NavigateUp.ExecuteAsync();
 
 			ResetRenameDoubleClick();

@@ -1773,7 +1773,7 @@
     <value>Etiqueta</value>
   </data>
   <data name="SettingsOpenItemsWithOneClick" xml:space="preserve">
-    <value>Abrir elementos con un solo clic</value>
+    <value>Open files with a single click</value>
   </data>
   <data name="FolderPath" xml:space="preserve">
     <value>Ruta de la carpeta</value>
@@ -2072,8 +2072,8 @@
   <data name="Lockscreen" xml:space="preserve">
     <value>Pantalla de bloqueo</value>
   </data>
-  <data name="OpenFolderWithOneClickColumnsLayout" xml:space="preserve">
-    <value>Abrir carpetas con un solo clic en el diseño de columnas</value>
+  <data name="OpenFolderWithOneClick" xml:space="preserve">
+    <value>Open folders with a single click</value>
   </data>
   <data name="OpeningItems" xml:space="preserve">
     <value>Abrir elementos</value>
@@ -3487,6 +3487,9 @@
   <data name="ProcessingItems" xml:space="preserve">
     <value>Procesando elementos...</value>
   </data>
+  <data name="DiscoveringItems" xml:space="preserve">
+    <value>Descubriendo elementos...</value>
+  </data>
   <data name="SpeedWithColon" xml:space="preserve">
     <value>Velocidad:</value>
   </data>
@@ -3595,7 +3598,7 @@
     <comment>Shown in a StatusCenter card.</comment>
   </data>
   <data name="StatusCenter_CopyComplete_Header" xml:space="preserve">
-    <value>{0, plural, one {Copiado # elemento} other {Copiados # elementos}} a "{1}"</value>
+    <value>{0, plural, one {Copiado # elemento} other {Copiados # elementos}} en "{1}"</value>
     <comment>Shown in a StatusCenter card.</comment>
   </data>
   <data name="StatusCenter_CopyComplete_SubHeader" xml:space="preserve">
@@ -3617,6 +3620,10 @@
   <data name="StatusCenter_CopyInProgress_SubHeader" xml:space="preserve">
     <value>Copiando {0, plural, one {# elemento} other {# elementos}} desde "{1}" a "{2}"</value>
     <comment>Shown in a StatusCenter card.</comment>
+  </data>
+  <data name="StatusCenter_CopyDiscovery_Header" xml:space="preserve">
+    <value>{0, plural, one {Descubierto # elemento} other {Descubiertos # elementos}}</value>
+    <comment>Shown in a StatusCenter card during file discovery phase.</comment>
   </data>
   <data name="StatusCenter_DecompressCanceled_Header" xml:space="preserve">
     <value>Cancelada la extracción de {0} elementos en "{1}"</value>
@@ -3938,7 +3945,7 @@
     <comment>Image alignment type</comment>
   </data>
   <data name="Fill" xml:space="preserve">
-    <value>Relleno</value>
+    <value>Rellenar</value>
     <comment>Image stretch type</comment>
   </data>
   <data name="HorizontalAlignment" xml:space="preserve">
@@ -3963,11 +3970,11 @@
     <comment>Image alignment type</comment>
   </data>
   <data name="Uniform" xml:space="preserve">
-    <value>Uniforme</value>
+    <value>Ajustar</value>
     <comment>Image stretch type</comment>
   </data>
   <data name="UniformToFill" xml:space="preserve">
-    <value>Rellenar uniforme</value>
+    <value>Escalar para rellenar</value>
     <comment>Image stretch type</comment>
   </data>
   <data name="VerticalAlignment" xml:space="preserve">
@@ -4324,5 +4331,11 @@
   </data>
   <data name="FailedToOpenLogFile" xml:space="preserve">
     <value>No se puede abrir el archivo de registro</value>
+  </data>
+  <data name="ShowStatusBar" xml:space="preserve">
+    <value>Mostrar barra de estado</value>
+  </data>
+  <data name="OnlyInColumnsView" xml:space="preserve">
+    <value>Only in Columns View</value>
   </data>
 </root>

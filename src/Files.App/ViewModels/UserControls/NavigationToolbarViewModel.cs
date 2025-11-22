@@ -510,7 +510,8 @@ namespace Files.App.ViewModels.UserControls
 				return;
 
 			if (normalizedInput.Equals(ContentPageContext.ShellPage.ShellViewModel.WorkingDirectory) &&
-				ContentPageContext.ShellPage.CurrentPageType != typeof(HomePage))
+				ContentPageContext.ShellPage.CurrentPageType != typeof(HomePage) &&
+				!ContentPageContext.ShellPage.ShellViewModel.IsSearchResults)
 				return;
 
 			if (normalizedInput.Equals("Home", StringComparison.OrdinalIgnoreCase) ||
@@ -942,76 +943,108 @@ namespace Files.App.ViewModels.UserControls
 			void AddNoResultsItem()
 			{
 				PathModeSuggestionItems.Clear();
+				
+				// Use null-safe access to avoid NullReferenceException during app lifecycle transitions
+				var workingDirectory = string.IsNullOrEmpty(ContentPageContext.ShellPage?.ShellViewModel?.WorkingDirectory)
+					? Constants.UserEnvironmentPaths.HomePath
+					: ContentPageContext.ShellPage.ShellViewModel.WorkingDirectory;
+				
 				PathModeSuggestionItems.Add(new(
-					ContentPageContext.ShellPage.ShellViewModel.WorkingDirectory,
+					workingDirectory,
 					Strings.NavigationToolbarVisiblePathNoResults.GetLocalizedResource()));
 			}
 		}
 
 		public async Task PopulateOmnibarSuggestionsForCommandPaletteMode()
 		{
-			var newSuggestions = new List<NavigationBarSuggestionItem>();
-
-			if (ContentPageContext.SelectedItems.Count == 1 && ContentPageContext.SelectedItem is not null && !ContentPageContext.SelectedItem.IsFolder)
+			var (suggestionsToProcess, commandsToProcess) = await Task.Run(() =>
 			{
-				try
+				var suggestions = new List<NavigationBarSuggestionItem>();
+
+				if (ContentPageContext.SelectedItems.Count == 1 && ContentPageContext.SelectedItem is not null && !ContentPageContext.SelectedItem.IsFolder)
 				{
-					var selectedItemPath = ContentPageContext.SelectedItem.ItemPath;
-					var fileActionEntity = ActionManager.Instance.EntityFactory.CreateFileEntity(selectedItemPath);
-					var actions = ActionManager.Instance.ActionRuntime.ActionCatalog.GetActionsForInputs(new[] { fileActionEntity });
-
-					foreach (var action in actions.Where(a => a.Definition.Description.Contains(OmnibarCommandPaletteModeText, StringComparison.OrdinalIgnoreCase)))
+					try
 					{
-						var newItem = new NavigationBarSuggestionItem
-						{
-							PrimaryDisplay = action.Definition.Description,
-							SearchText = OmnibarCommandPaletteModeText,
-							ActionInstance = action
-						};
+						var selectedItemPath = ContentPageContext.SelectedItem.ItemPath;
+						var fileActionEntity = ActionManager.Instance.EntityFactory.CreateFileEntity(selectedItemPath);
+						var actions = ActionManager.Instance.ActionRuntime.ActionCatalog.GetActionsForInputs(new[] { fileActionEntity });
 
-						if (Uri.TryCreate(action.Definition.IconFullPath, UriKind.RelativeOrAbsolute, out Uri? validUri))
+						foreach (var action in actions.Where(a => a.Definition.Description.Contains(OmnibarCommandPaletteModeText, StringComparison.OrdinalIgnoreCase)))
 						{
-							try
+							var newItem = new NavigationBarSuggestionItem
 							{
-								newItem.ActionIconSource = new BitmapImage(validUri);
-							}
-							catch (Exception)
+								PrimaryDisplay = action.Definition.Description,
+								SearchText = OmnibarCommandPaletteModeText,
+								ActionInstance = action
+							};
+
+							if (Uri.TryCreate(action.Definition.IconFullPath, UriKind.RelativeOrAbsolute, out Uri? validUri))
 							{
+								try
+								{
+									newItem.ActionIconSource = new BitmapImage(validUri);
+								}
+								catch (Exception)
+								{
+								}
 							}
+
+							suggestions.Add(newItem);
 						}
-
-						newSuggestions.Add(newItem);
+					}
+					catch (Exception ex)
+					{
+						App.Logger.LogWarning(ex, ex.Message);
 					}
 				}
-				catch (Exception ex)
-				{
-					App.Logger.LogWarning(ex, ex.Message);
-				}
-			}
 
-			IEnumerable<NavigationBarSuggestionItem> suggestionItems = null!;
-
-			await Task.Run(() =>
-			{
-				suggestionItems = Commands
-					.Where(command => command.IsExecutable
-						&& command.IsAccessibleGlobally
+				var commandsData = Commands
+					.Where(command => command.IsAccessibleGlobally
 						&& (command.Description.Contains(OmnibarCommandPaletteModeText, StringComparison.OrdinalIgnoreCase)
 							|| command.Code.ToString().Contains(OmnibarCommandPaletteModeText, StringComparison.OrdinalIgnoreCase)))
-					.Select(command => new NavigationBarSuggestionItem
-					{
-						ThemedIconStyle = command.Glyph.ToThemedIconStyle(),
-						Glyph = command.Glyph.BaseGlyph,
-						Text = command.Description,
-						PrimaryDisplay = command.Description,
-						HotKeys = command.HotKeys,
-						SearchText = OmnibarCommandPaletteModeText,
-					})
-					.Where(item => item.Text != Commands.OpenCommandPalette.Description.ToString());
+					.Where(command => command.Description != Commands.OpenCommandPalette.Description.ToString())
+					.ToList();
+
+				return (suggestions, commandsData);
 			});
 
-			newSuggestions.AddRange(suggestionItems);
+			var newSuggestions = new List<NavigationBarSuggestionItem>(suggestionsToProcess);
+			int processedCount = 0;
 
+			foreach (var command in commandsToProcess)
+			{				
+				if (!command.IsExecutable)
+				{
+					processedCount++;
+					// To allow UI updates
+					if (processedCount % 3 == 0)
+						await Task.Yield();
+					continue;
+				}
+
+				var newItem = new NavigationBarSuggestionItem
+				{
+					ThemedIconStyle = command.Glyph.ToThemedIconStyle(),
+					Glyph = command.Glyph.BaseGlyph,
+					Text = command.Description,
+					PrimaryDisplay = command.Description,
+					HotKeys = command.HotKeys,
+					SearchText = OmnibarCommandPaletteModeText,
+				};
+
+				newSuggestions.Add(newItem);
+				processedCount++;
+
+				// To allow UI updates
+				if (processedCount % 3 == 0)
+					await Task.Yield();
+			}
+
+			UpdateCommandPaletteSuggestions(newSuggestions);
+		}
+
+		private void UpdateCommandPaletteSuggestions(List<NavigationBarSuggestionItem> newSuggestions)
+		{
 			if (newSuggestions.Count == 0)
 			{
 				newSuggestions.Add(new NavigationBarSuggestionItem()
