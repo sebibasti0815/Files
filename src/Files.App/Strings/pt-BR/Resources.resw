@@ -283,7 +283,7 @@
     <value>Excluir</value>
   </data>
   <data name="PinFolderToSidebar" xml:space="preserve">
-    <value>Fixar na Barra Lateral</value>
+    <value>Fixar na barra lateral</value>
   </data>
   <data name="WelcomeDialog.Title" xml:space="preserve">
     <value>Bem-vindo ao Files!</value>
@@ -301,7 +301,7 @@
     <value>Insira o nome do item</value>
   </data>
   <data name="CreateNewItemTitle" xml:space="preserve">
-    <value>Criar  {0}</value>
+    <value>Criar novo {0}</value>
   </data>
   <data name="LightTheme" xml:space="preserve">
     <value>Claro</value>
@@ -2032,7 +2032,7 @@
   </data>
   <data name="ReviewFilesSubtitle" xml:space="preserve">
     <value>Gostando do Files? Considere fazer uma avaliação na Microsoft Store.</value>
-  </data>  
+  </data>
   <data name="SponsorSubtitle" xml:space="preserve">
     <value>Gostando do Files? Por favor, considere apoiar o projeto no GitHub.</value>
   </data>
@@ -4307,7 +4307,7 @@
   </data>
   <data name="Signatures" xml:space="preserve">
     <value>Assinaturas</value>
-   </data>
+  </data>
   <data name="SignatureList" xml:space="preserve">
     <value>Lista de assinaturas</value>
   </data>
@@ -4349,5 +4349,17 @@
   </data>
   <data name="CreateNewFile" xml:space="preserve">
     <value>Novo {0}</value>
+  </data>
+  <data name="EnableSmoothScrolling" xml:space="preserve">
+    <value>Ativar rolagem suave</value>
+  </data>
+  <data name="Scrolling" xml:space="preserve">
+    <value>Rolagem</value>
+  </data>
+  <data name="ShowPinToSideBar" xml:space="preserve">
+    <value>Mostrar a opção de Fixar na Barra Lateral</value>
+  </data>
+  <data name="ShowPinToStart" xml:space="preserve">
+    <value>Mostrar a opção de Fixar no Menu Iniciar</value>
   </data>
 </root>

@@ -2032,7 +2032,7 @@
   </data>
   <data name="ReviewFilesSubtitle" xml:space="preserve">
     <value>喜欢Files吗？请考虑在 Microsoft Store 中给我们写评价。</value>
-  </data>  
+  </data>
   <data name="SponsorSubtitle" xml:space="preserve">
     <value>喜欢Files吗？请考虑在 Github 上支持该项目。</value>
   </data>
@@ -4307,7 +4307,7 @@
   </data>
   <data name="Signatures" xml:space="preserve">
     <value>签名</value>
-   </data>
+  </data>
   <data name="SignatureList" xml:space="preserve">
     <value>签名列表</value>
   </data>
@@ -4348,6 +4348,18 @@
     <value>仅在列视图时</value>
   </data>
   <data name="CreateNewFile" xml:space="preserve">
-    <value>New {0}</value>
+    <value>新建 {0}</value>
+  </data>
+  <data name="EnableSmoothScrolling" xml:space="preserve">
+    <value>启用平滑翻页</value>
+  </data>
+  <data name="Scrolling" xml:space="preserve">
+    <value>翻页</value>
+  </data>
+  <data name="ShowPinToSideBar" xml:space="preserve">
+    <value>显示固定选项到侧边栏</value>
+  </data>
+  <data name="ShowPinToStart" xml:space="preserve">
+    <value>显示固定选项到“开始菜单”</value>
   </data>
 </root>

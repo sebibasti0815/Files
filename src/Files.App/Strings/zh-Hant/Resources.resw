@@ -148,7 +148,7 @@
     <value>大小：</value>
   </data>
   <data name="SizeOnDiskLabel" xml:space="preserve">
-    <value>在磁碟上的大小：</value>
+    <value>磁碟大小：</value>
   </data>
   <data name="UncompressedSize" xml:space="preserve">
     <value>未壓縮大小：</value>
@@ -1773,7 +1773,7 @@
     <value>檔案標籤</value>
   </data>
   <data name="SettingsOpenItemsWithOneClick" xml:space="preserve">
-    <value>點擊一下即開啟檔案</value>
+    <value>按一下即開啟檔案</value>
   </data>
   <data name="FolderPath" xml:space="preserve">
     <value>資料夾路徑</value>
@@ -1851,7 +1851,7 @@
     <value>註冊此程式以重新啟動</value>
   </data>
   <data name="StartWindow" xml:space="preserve">
-    <value>啟動視窗</value>
+    <value>啟動時視窗狀態</value>
   </data>
   <data name="NormalWindow" xml:space="preserve">
     <value>一般視窗</value>
@@ -2032,7 +2032,7 @@
   </data>
   <data name="ReviewFilesSubtitle" xml:space="preserve">
     <value>喜歡「Files」嗎？請考慮至 Microsoft Store 留下評論。</value>
-  </data>  
+  </data>
   <data name="SponsorSubtitle" xml:space="preserve">
     <value>喜歡 Files 嗎？請考慮在 GitHub 上支持本專案。</value>
   </data>
@@ -2397,7 +2397,7 @@
     <value>放大</value>
   </data>
   <data name="ToggleSortDirection" xml:space="preserve">
-    <value>排序方式</value>
+    <value>排序方向</value>
   </data>
   <data name="InvalidTagNameWarning" xml:space="preserve">
     <value>無效名稱</value>
@@ -2436,7 +2436,7 @@
     <value>切換隱藏項目顯示</value>
   </data>
   <data name="ToggleDotFilesSettingDescription" xml:space="preserve">
-    <value>顯示/隱藏點開頭的隱藏檔案</value>
+    <value>顯示/隱藏以點開頭的隱藏配置文件 (Dotfiles)</value>
   </data>
   <data name="ToggleShowFileExtensionsDescription" xml:space="preserve">
     <value>顯示/隱藏已知檔案類型的副檔名</value>
@@ -2730,10 +2730,10 @@
     <value>開啟新索引標籤頁面</value>
   </data>
   <data name="NavigateBackDescription" xml:space="preserve">
-    <value>下一頁</value>
+    <value>上一頁</value>
   </data>
   <data name="NavigateForwardDescription" xml:space="preserve">
-    <value>上一頁</value>
+    <value>下一頁</value>
   </data>
   <data name="NavigateUpDescription" xml:space="preserve">
     <value>上層目錄</value>
@@ -3043,7 +3043,7 @@
     <value>永久刪除</value>
   </data>
   <data name="DeleteItemPermanentlyDescription" xml:space="preserve">
-    <value>永久刪除選取的 {0, plural, one {item} other {items}}</value>
+    <value>永久刪除選取的{0, plural, other {項目}}</value>
   </data>
   <data name="PlayAllDescription" xml:space="preserve">
     <value>播放所選取的媒體檔</value>
@@ -4200,7 +4200,7 @@
     <comment>Appears when two compared hashes don't match</comment>
   </data>
   <data name="PathOrAlias" xml:space="preserve">
-    <value>檔案路徑或是alias</value>
+    <value>路徑或別名</value>
   </data>
   <data name="InvalidPath" xml:space="preserve">
     <value>無效的路徑</value>
@@ -4307,7 +4307,7 @@
   </data>
   <data name="Signatures" xml:space="preserve">
     <value>電子簽章</value>
-   </data>
+  </data>
   <data name="SignatureList" xml:space="preserve">
     <value>電子簽章清單</value>
   </data>
@@ -4349,5 +4349,17 @@
   </data>
   <data name="CreateNewFile" xml:space="preserve">
     <value>新增 '{0}'</value>
+  </data>
+  <data name="EnableSmoothScrolling" xml:space="preserve">
+    <value>開啟平滑捲動</value>
+  </data>
+  <data name="Scrolling" xml:space="preserve">
+    <value>捲動</value>
+  </data>
+  <data name="ShowPinToSideBar" xml:space="preserve">
+    <value>顯示「釘選到側邊欄」的選項</value>
+  </data>
+  <data name="ShowPinToStart" xml:space="preserve">
+    <value>顯示「釘選到開始選單」的選項</value>
   </data>
 </root>

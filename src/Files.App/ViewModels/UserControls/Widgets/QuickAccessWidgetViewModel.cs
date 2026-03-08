@@ -111,11 +111,19 @@ namespace Files.App.ViewModels.UserControls.Widgets
 				}.Build(),
 				new()
 				{
+					Text = Strings.Properties.GetLocalizedResource(),
+					ThemedIconModel = new() { ThemedIconStyle = "App.ThemedIcons.Properties" },
+					Command = OpenPropertiesCommand,
+					CommandParameter = item,
+					IsPrimary = true
+				},
+				new()
+				{
 					Text = Strings.PinFolderToSidebar.GetLocalizedResource(),
 					ThemedIconModel = new() { ThemedIconStyle = "App.ThemedIcons.FavoritePin" },
 					Command = PinToSidebarCommand,
 					CommandParameter = item,
-					ShowItem = !isPinned
+					ShowItem = !isPinned && UserSettingsService.GeneralSettingsService.ShowPinToSideBar
 				},
 				new()
 				{
@@ -123,20 +131,13 @@ namespace Files.App.ViewModels.UserControls.Widgets
 					ThemedIconModel = new() { ThemedIconStyle = "App.ThemedIcons.FavoritePinRemove" },
 					Command = UnpinFromSidebarCommand,
 					CommandParameter = item,
-					ShowItem = isPinned
+					ShowItem = isPinned && UserSettingsService.GeneralSettingsService.ShowPinToSideBar
 				},
 				new()
 				{
 					Text = Strings.SendTo.GetLocalizedResource(),
 					Tag = "SendToPlaceholder",
 					ShowItem = UserSettingsService.GeneralSettingsService.ShowSendToMenu
-				},
-				new()
-				{
-					Text = Strings.Properties.GetLocalizedResource(),
-					ThemedIconModel = new() { ThemedIconStyle = "App.ThemedIcons.Properties" },
-					Command = OpenPropertiesCommand,
-					CommandParameter = item
 				},
 				new ContextMenuFlyoutItemViewModel()
 				{

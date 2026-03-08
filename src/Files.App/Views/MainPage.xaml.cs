@@ -11,6 +11,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
+using System.Runtime.InteropServices;
 using Windows.Foundation.Metadata;
 using Windows.Graphics;
 using Windows.UI.Input;
@@ -204,7 +205,7 @@ namespace Files.App.Views
 
 		protected override void OnNavigatedTo(NavigationEventArgs e)
 		{
-			ViewModel.OnNavigatedToAsync(e);
+			_ = ViewModel.OnNavigatedToAsync(e);
 		}
 
 		protected override async void OnPreviewKeyDown(KeyRoutedEventArgs e) => await OnPreviewKeyDownAsync(e);
@@ -399,11 +400,12 @@ namespace Files.App.Views
 			try
 			{
 				var isHomePage = !(SidebarAdaptiveViewModel.PaneHolder?.ActivePane?.InstanceViewModel?.IsPageTypeNotHome ?? false);
+				var isReleaseNotesPage = SidebarAdaptiveViewModel.PaneHolder?.ActivePane?.InstanceViewModel?.IsPageTypeReleaseNotes ?? false;
 				var isMultiPane = SidebarAdaptiveViewModel.PaneHolder?.IsMultiPaneActive ?? false;
 				var isBigEnough = !App.AppModel.IsMainWindowClosed &&
 					(MainWindow.Instance.Bounds.Width > 450 && MainWindow.Instance.Bounds.Height > 450 || RootGrid.ActualWidth > 700 && MainWindow.Instance.Bounds.Height > 360);
 
-				ViewModel.ShouldPreviewPaneBeDisplayed = (!isHomePage || isMultiPane) && isBigEnough;
+				ViewModel.ShouldPreviewPaneBeDisplayed = ((!isHomePage && !isReleaseNotesPage) || isMultiPane) && isBigEnough;
 				ViewModel.ShouldPreviewPaneBeActive = UserSettingsService.InfoPaneSettingsService.IsInfoPaneEnabled && ViewModel.ShouldPreviewPaneBeDisplayed;
 				ViewModel.ShouldViewControlBeDisplayed = SidebarAdaptiveViewModel.PaneHolder?.ActivePane?.InstanceViewModel?.IsPageTypeNotHome ?? false;
 
@@ -475,20 +477,33 @@ namespace Files.App.Views
 		private async void SidebarControl_ItemDragOver(object sender, ItemDragOverEventArgs e)
 		{
 			var deferral = e.RawEvent.GetDeferral();
-			await SidebarAdaptiveViewModel.HandleItemDragOverAsync(e);
+
+			await SafetyExtensions.IgnoreExceptions(async () =>
+			{
+				await SidebarAdaptiveViewModel.HandleItemDragOverAsync(e);
+			}, App.Logger);
+
 			deferral.Complete();
 		}
 
 		private async void SidebarControl_ItemDropped(object sender, ItemDroppedEventArgs e)
 		{
 			var deferral = e.RawEvent.GetDeferral();
-			await SidebarAdaptiveViewModel.HandleItemDroppedAsync(e);
+
+			await SafetyExtensions.IgnoreExceptions(async () =>
+			{
+				await SidebarAdaptiveViewModel.HandleItemDroppedAsync(e);
+			}, App.Logger);
+
 			deferral.Complete();
 		}
 
 		private void SidebarControl_ItemInvoked(object sender, ItemInvokedEventArgs e)
 		{
-			SidebarAdaptiveViewModel.HandleItemInvokedAsync(((SidebarItem)sender).Item, e.PointerUpdateKind);
+			if (sender is not SidebarItem { Item: ISidebarItemModel item })
+				return;
+
+			SidebarAdaptiveViewModel.HandleItemInvokedAsync(item, e.PointerUpdateKind);
 		}
 	}
 }
