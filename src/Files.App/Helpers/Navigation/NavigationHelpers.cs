@@ -148,8 +148,66 @@ namespace Files.App.Helpers
 				var a2 = navigationArg is PaneNavigationArguments pna2 ? pna2 : new PaneNavigationArguments() { LeftPaneNavPathParam = navigationArg as string };
 
 				if (a1.LeftPaneNavPathParam == a2.LeftPaneNavPathParam && a1.RightPaneNavPathParam == a2.RightPaneNavPathParam)
-					(tabItem.Header, tabItem.IconSource, tabItem.ToolTipText) = result;
+				{
+					tabItem.Description = result.Item1;
+					tabItem.IconSource = result.Item2;
+					tabItem.ToolTipText = result.Item3;
+					RefreshTabPathHints();
+				}
 			}
+		}
+
+		internal static void RefreshTabPathHints()
+		{
+			foreach (var group in MainPageViewModel.AppInstances
+				.Where(t => !string.IsNullOrEmpty(t.Description))
+				.GroupBy(t => t.Description!, StringComparer.OrdinalIgnoreCase))
+			{
+				var tabs = group.ToArray();
+
+				foreach (var t in tabs)
+					t.Header = t.Description;
+
+				if (tabs.Length < 2 || tabs[0].Description!.Contains(" | "))
+					continue;
+
+				var hints = tabs.ToDictionary(t => t, t => AncestorHints(t.ToolTipText));
+
+				foreach (var tab in tabs)
+				{
+					for (var d = 0; d < hints[tab].Length; d++)
+					{
+						if (tabs.All(t => t == tab || d >= hints[t].Length || hints[t][d] != hints[tab][d]))
+						{
+							tab.Header = $"{hints[tab][d]}\\{tab.Description}";
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		private static string[] AncestorHints(string? path)
+		{
+			var result = new List<string>();
+
+			try
+			{
+				var root = (PathNormalization.GetPathRoot(path) ?? "").TrimEnd('\\', '/');
+				var prefix = root.Length >= 2 && root[1] == ':'
+					? $"{char.ToUpperInvariant(root[0])}:\\..."
+					: root.Length > 0 ? $"{root}\\..." : "...";
+
+				var dir = path?.TrimEnd('\\', '/');
+				while ((dir = Path.GetDirectoryName(dir)) is not null
+					&& Path.GetFileName(dir) is { Length: > 0 } seg)
+				{
+					result.Add($"{prefix}\\{seg}");
+				}
+			}
+			catch (ArgumentException) { }
+
+			return result.ToArray();
 		}
 
 		public static async Task<ImageSource?> GetIconForPathAsync(string path)
@@ -631,10 +689,19 @@ namespace Files.App.Helpers
 								{
 									//try using launcher first
 									bool launchSuccess = false;
+
+									// The Windows 11 Photos app ignores NeighboringFilesQuery when launched as default app.
+									// Use the app URI only when this extension is associated with Microsoft Photos.
+									if (FileAssociationHelpers.IsMicrosoftPhotosDefaultAssociation(fileExtension))
+									{
+										string uri = $"ms-photos:viewer?fileName={Uri.EscapeDataString(path)}";
+										launchSuccess = await Launcher.LaunchUriAsync(new Uri(uri));
+									}
+
 									BaseStorageFileQueryResult? fileQueryResult = null;
 									//Get folder to create a file query (to pass to apps like Photos, Movies & TV..., needed to scroll through the folder like what Windows Explorer does)
 									BaseStorageFolder currentFolder = await shellViewModel.GetFolderFromPathAsync(PathNormalization.GetParentDir(path));
-									if (currentFolder is not null)
+									if (!launchSuccess && currentFolder is not null)
 									{
 										QueryOptions queryOptions = new(CommonFileQuery.DefaultQuery, null);
 										//We can have many sort entries
